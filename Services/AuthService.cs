@@ -1,21 +1,29 @@
-﻿using Microsoft.Data.SqlClient;
-using BCrypt.Net;
-using Thiskord_Back.Models.Auth;
-using System.Diagnostics;
+﻿using BCrypt.Net;
+using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Thiskord_Back.Models.Auth;
+using Microsoft.Extensions.Configuration;
+
 namespace Thiskord_Back.Services
 {
     public class AuthService
     {
         private readonly IDbConnectionService _dbService;
         private readonly JsonService _jsonService;
+        private readonly IConfiguration _configuration;
 
-        public AuthService(IDbConnectionService dbService, JsonService jsonService)
+        public AuthService(IDbConnectionService dbService, JsonService jsonService, IConfiguration configuration)
         {
             _dbService = dbService;
             _jsonService = jsonService;
+            _configuration = configuration;
         }
-        public string AuthLogin(string user_auth, string user_password)
+        public AuthenticatedUser AuthLogin(string user_auth, string user_password)
         {
             // requete en base pour chopper les infos utilisateurs : user_auth
             SqlConnection conn = _dbService.CreateConnection();
@@ -43,30 +51,25 @@ namespace Thiskord_Back.Services
                 user_id = res1.GetInt32(0);
                 User user = new User(res1.GetString(1), res1.GetString(2), res1.GetString(3));
                 res1.Close();
-                query = "SELECT id_project_account FROM ACCESS WHERE id_account = @user_id;";
-                using var command2 = new SqlCommand(query, conn);
-                command2.Parameters.AddWithValue("@user_id", user_id);
-                using var res2 = command2.ExecuteReader();
-                List<int> projects = new List<int>();
-                while (res2.Read())
-                {
-                    projects.Add(res2.GetInt32(0));
-                }
-                res2.Close();
+                var claims = new[] { new Claim(ClaimTypes.Name, user_auth) }; 
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)); 
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); 
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"], 
+                    audience: _configuration["Jwt:Audience"], 
+                    claims: claims, 
+                    expires: DateTime.UtcNow.AddHours(2), 
+                    signingCredentials: creds
+                ); 
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+                Console.WriteLine(tokenString);
+                return new AuthenticatedUser(user, tokenString);
 
-                //return _jsonService.toJson(new AuthenticatedUser(user, projects));
-                //return new AuthenticatedUser(user, projects.ToArray());
-                return user_id.ToString();
 
-                // requete pour aller chercher la liste de projets
-                // return JsonContent(new AuthenticatedUser())
             }
             else
-                //return "Y'a pas";
-                return null;
             {
-
-            //return _jsonService.toJson(new AuthenticatedUser());
+                return null;
             }
         }
     }
