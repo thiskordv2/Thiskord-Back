@@ -1,24 +1,30 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Thiskord_Back.Models.Project
 {
     public class Project
     {
-        private string _id;
-        private string _name;
-        private string _description;
+        public int? id { get; set; }
+        public string? name { get; set; }
+        public string? description { get; set; }
 
-        public Project(string id, string name, string description)
+        public Project(int id, string name, string description)
         {
-            this._name = name;
-            this._description = description;
-            this._id = id;
+            this.id= id;
+            this.name = name;
+            this.description = description;
+        }
+
+        public class ProjectRequest
+        {
+            [JsonPropertyName("project_name")]
+            public string name { get; set; }
+            
+            [JsonPropertyName("project_desc")]
+            public string description { get; set; }
         }
     }
-
-    public class ProjectRequest
-    {
-        public string project_name { get; set; }
-        public string project_desc { get; set; }
-    }
+    
 
 }

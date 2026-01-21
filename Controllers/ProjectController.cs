@@ -16,7 +16,7 @@ namespace Thiskord_Back.Controllers
         public ProjectController(ProjectService projectService, LogService logService)
         {
             _projectService = projectService;
-            _logService = logService ;
+            _logService = logService;
         }
 
         // GET: HomeController/Create
@@ -27,32 +27,48 @@ namespace Thiskord_Back.Controllers
 
         // POST: HomeController/Create
         [HttpPost("create")]
-        public ActionResult Create([FromBody] ProjectRequest req)
+        public ActionResult Create([FromBody] Project.ProjectRequest req)
         {
-            if (string.IsNullOrEmpty(req.project_name))
+            if (string.IsNullOrEmpty(req.name))
             {
                 _logService.CreateLog("Il manque le titre");
-                return BadRequest(new{error = "Il n'y a pas de titre pour le projet"});
+                return BadRequest(new { error = "Il n'y a pas de titre pour le projet" });
             }
-            else
+
+            try
             {
-                try
-                {
-                    // envois des données au service de création de projet
-                    int pro = _projectService.CreateProject(req.project_name, req.project_desc);
+                // envois des données au service de création de projet
+                int pro = _projectService.CreateProject(req.name, req.description);
 
-                    return Ok(pro);
+                return Ok(pro);
 
-                }
-                catch (Exception ex)
-                {
-             
-                    // TODO: ajouter un message d'erreur au logs
-                    
-                    return BadRequest(ex.Message);
-
-                }
             }
+            catch (Exception ex)
+            {
+
+                // TODO: ajouter un message d'erreur au logs
+
+                return BadRequest(ex.Message);
+
+            }
+        }
+
+        [HttpGet("all")]
+        public ActionResult GetAllProjects()
+        {
+            try
+            {
+                var pro = _projectService.GetAllProjects();
+                return Ok(pro);
+
+            }
+            catch (Exception ex)
+            {
+                _logService.CreateLog($"Erreur récupération projets : {ex.Message}");
+                return StatusCode(500, "Une erreur interne est survenue lors de la récupération des projets.");
+            }
+
+
         }
     }
 }

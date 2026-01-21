@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Thiskord_Back.Models.Project;
 
 namespace Thiskord_Back.Services
 {
@@ -58,5 +59,45 @@ namespace Thiskord_Back.Services
                 return -3;
             }
         }
+        
+        public List<Project> GetAllProjects()
+        {
+            var projects = new List<Project>();
+
+            try
+            {
+                using (SqlConnection conn = _dbService.CreateConnection())
+                {
+                    conn.Open();
+                    string query = @"
+                        SELECT
+                            [project_id] as [id], 
+                            [project_name], 
+                            [project_desc] 
+                        FROM [dbo].[Project]";
+
+                    using (SqlCommand command = new SqlCommand(query, conn))
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = Convert.ToInt32(reader["id"]);
+                            string name = reader["project_name"]?.ToString() ?? string.Empty;
+                            string description = reader["project_desc"]?.ToString() ?? string.Empty;
+
+                            projects.Add(new Project(id, name, description));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logService.CreateLog($"Erreur lors de la récupération des projets : {ex}");
+                throw;
+            }
+
+            return projects;
+        }
+
     }
 }

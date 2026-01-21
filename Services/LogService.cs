@@ -8,7 +8,6 @@ namespace Thiskord_Back.Services
     // La classe implémente l'interface ILogService
     public class LogService
     {
-        private readonly string _logFilePath;
         private readonly string _connectionString;
 
         public LogService(IConfiguration config)
@@ -16,8 +15,6 @@ namespace Thiskord_Back.Services
             // Récupération de la chaîne de connexion via l'injection de IConfiguration
             _connectionString = config.GetConnectionString("DefaultConnection")
                                 ?? throw new InvalidOperationException("La chaîne de connexion 'Default' est introuvable.");
-            string dossierDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            _logFilePath = Path.Combine(dossierDocuments, "logs.txt");
         }
 
         // Implémentation de la méthode synchrone de l'interface
@@ -56,7 +53,7 @@ namespace Thiskord_Back.Services
         {
             try
             {
-                using (StreamWriter sw = new StreamWriter(_logFilePath, append: true))
+                using (StreamWriter sw = new StreamWriter("logs.txt", true))
                 {
                     sw.WriteLine($"{DateTime.Now}: {message}");
                 }
