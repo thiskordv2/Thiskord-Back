@@ -16,7 +16,7 @@ namespace Thiskord_Back.Controllers
         }
 
         [HttpPost("channel")]
-
+        
         public IActionResult CreateChannel()
         {
             try
@@ -26,6 +26,19 @@ namespace Thiskord_Back.Controllers
 
             }
             catch (System.Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
+            }
+        }
+        [HttpDelete("{id:int}")]
+        public IActionResult DeleteChannel(int id)
+        {
+            try
+            {
+                _channelService.DeleteById(id);
+                return Ok(new { resultat = "success" });
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
             }

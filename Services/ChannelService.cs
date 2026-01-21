@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -51,10 +52,28 @@ namespace Thiskord_Back.Services
                 logService.CreateLog(ex.Message);
                 
             };
-
-
-
             return channel;
+
+
+       
+        }
+        public void DeleteById(int channelId)
+        {
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+                    string deleteQuery = "DELETE FROM Channel WHERE channel_id = @Id";
+                    using var deleteCommand = new SqlCommand(deleteQuery, connection);
+                    deleteCommand.Parameters.AddWithValue("@Id", channelId);
+                    deleteCommand.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog(ex.Message);
+            }
         }
     }
 }
