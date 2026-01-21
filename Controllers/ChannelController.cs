@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Thiskord_Back.Models.Channel;
 using Thiskord_Back.Services;
 
 namespace Thiskord_Back.Controllers
@@ -15,13 +16,13 @@ namespace Thiskord_Back.Controllers
             _channelService = channelService;
         }
 
-        [HttpPost("channel")]
+        [HttpPost("create")]
         
-        public IActionResult CreateChannel()
+        public IActionResult CreateChannel([FromBody] ChannelRequest req)
         {
             try
             {
-                _channelService.Create("general2", "canal general2");
+                _channelService.Create(req.name, req.description);
                 return Ok(new { resultat = "success" });
 
             }
@@ -36,6 +37,19 @@ namespace Thiskord_Back.Controllers
             try
             {
                 _channelService.DeleteById(id);
+                return Ok(new { resultat = "success" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
+            }
+        }
+        [HttpPut("{id:int}")]
+        public IActionResult UpdateChannel([FromBody] ChannelRequest req, int id)
+        {
+            try
+            {
+                _channelService.Update(id, req.name, req.description);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)

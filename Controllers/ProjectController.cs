@@ -54,7 +54,5 @@ namespace Thiskord_Back.Controllers
                 }
             }
         }
-
-    
     }
 }

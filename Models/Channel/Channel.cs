@@ -2,20 +2,20 @@
 {
     public class Channel
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
     }
 
     public class ChannelRequest
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
     }
     public class ChannelUser
     {
-        public int Id { get; set; }
-        public int ChannelId { get; set; }
-        public string UserId { get; set; }
+        public int id { get; set; }
+        public int channelId { get; set; }
+        public string userId { get; set; }
     }
 }

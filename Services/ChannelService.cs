@@ -26,8 +26,8 @@ namespace Thiskord_Back.Services
 
             var channel = new Channel
             {
-                Name = channel_name,
-                Description = channel_desc
+                name = channel_name,
+                description = channel_desc
             };
 
             try
@@ -44,7 +44,7 @@ namespace Thiskord_Back.Services
                     command.Parameters.AddWithValue("@Name", channel_name);
                     command.Parameters.AddWithValue("@Description", channel_desc);
 
-                    channel.Id = (int)command.ExecuteScalar();
+                    channel.id = (int)command.ExecuteScalar();
 
                 }
             } catch (Exception ex)
@@ -74,6 +74,46 @@ namespace Thiskord_Back.Services
             {
                 logService.CreateLog(ex.Message);
             }
+        }
+        public Channel Update(int channel_id, string channel_name, string channel_desc)
+        {
+
+            if (string.IsNullOrWhiteSpace(channel_name))
+                throw new ArgumentException("Le nom du canal ne peut pas être vide.", nameof(channel_name));
+
+            var channel = new Channel
+            {
+                name = channel_name,
+                description = channel_desc
+            };
+
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+
+                    string query = @"UPDATE Channel SET channel_name = @Name , channel_desc = @Description WHERE channel_id = @Id";
+
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Id", channel_id);
+                    command.Parameters.AddWithValue("@Name", channel_name);
+                    command.Parameters.AddWithValue("@Description", channel_desc);
+
+                    command.ExecuteNonQuery();
+                    channel.id = channel_id;
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog(ex.Message);
+
+            }
+            ;
+            return channel;
+
+
+
         }
     }
 }
