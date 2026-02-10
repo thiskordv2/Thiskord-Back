@@ -53,17 +53,14 @@ namespace Thiskord_Back.Services
         {
             try
             {
-                StreamWriter sw = new StreamWriter("C:\\Users\\hikme\\OneDrive - Groupe Mont-Roland\\Documents\\AK Emre LID\\Projet C#\\logs.txt");
-                sw.Write(message);
-                sw.Close();
+                using (StreamWriter sw = new StreamWriter("logs.txt", true))
+                {
+                    sw.WriteLine($"{DateTime.Now}: {message}");
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: " + e.Message);
-            }
-            finally
-            {
-                Console.WriteLine("Executing finally block.");
+                Console.WriteLine("Log error pour les logs " + e.Message);
             }
         }
 

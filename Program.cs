@@ -37,6 +37,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddScoped<Thiskord_Back.Services.ChannelService>();
 
 var app = builder.Build();
 

@@ -1,62 +1,153 @@
 ﻿using Microsoft.Data.SqlClient;
+using Microsoft.Identity.Client;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Thiskord_Back.Models.Project;
 
 namespace Thiskord_Back.Services
 {
     public class ProjectService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly LogService _logService;
+
+        private readonly LogService logService;
 
         public ProjectService(IDbConnectionService dbService, LogService logService)
         {
-            _dbService = dbService;
-            _logService = logService;
+            this._dbService = dbService;
+            this.logService = logService;
         }
-
-        public async Task<int> CreateProject(string project_name, string project_desc)
+        public Project Create(string project_name, string project_desc)
         {
-            DateTime modified_at = DateTime.Now;
+
+            if (string.IsNullOrWhiteSpace(project_name))
+                throw new ArgumentException("Le nom du canal ne peut pas être vide.", nameof(project_name));
+
+            var project = new Project
+            {
+                name = project_name,
+                description = project_desc
+            };
+
             try
             {
-                using (SqlConnection conn = _dbService.CreateConnection())
+                using (var connection = _dbService.CreateConnection())
                 {
-                    SqlTransaction transaction;
-                    await conn.OpenAsync();
-                    transaction = conn.BeginTransaction();
-                    string query = "INSERT INTO Project (project_name, project_desc, modified_at) VALUES (@project_name, @project_desc, @modified_at); SELECT SCOPE_IDENTITY();";
-                    using (SqlCommand command = new SqlCommand(query, conn))
-                    {
-                        command.Transaction = transaction;
-                        try
-                        {
-                            command.Parameters.AddWithValue("@project_name", project_name);
-                            command.Parameters.AddWithValue("@project_desc", project_desc);
-                            command.Parameters.AddWithValue("@modified_at", modified_at);
-                            object result = await command.ExecuteScalarAsync();
-                            transaction.Commit();
-                            return result != null ? Convert.ToInt32(result) : -1;
-                        }
-                        catch (Exception ex2)
-                        {
-                            _logService.CreateLog($"Erreur lors de l'exécution de la commande SQL : {ex2.Message}");
-                            try
-                            {
-                                transaction.Rollback();
-                            }
-                            catch (Exception exRollback)
-                            {
-                                _logService.CreateLog($"Erreur lors du rollback de la transaction : {exRollback.Message}");
-                            }
-                            return -2;
-                        };
-                    };
+                    connection.Open();
+
+                    string query = @"INSERT INTO Project (project_name, project_desc) 
+                                     VALUES (@Name, @Description); 
+                                     SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Name", project_name);
+                    command.Parameters.AddWithValue("@Description", project_desc);
+
+                    project.id = (int)command.ExecuteScalar();
+
+                }
+            } catch (Exception ex)
+            {
+                logService.CreateLog(ex.Message);
+                
+            };
+            return project;
+
+
+       
+        }
+        public void DeleteById(int projectId)
+        {
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+                    string deleteQuery = "DELETE FROM Project WHERE project_id = @Id";
+                    using var deleteCommand = new SqlCommand(deleteQuery, connection);
+                    deleteCommand.Parameters.AddWithValue("@Id", projectId);
+                    deleteCommand.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex3)
+            catch (Exception ex)
             {
-                _logService.CreateLog($"Erreur lors de la création du projet : {ex3.Message}");
-                return -3;
+                logService.CreateLog(ex.Message);
             }
+        }
+        public Project Update(int project_id, string project_name, string project_desc)
+        {
+
+            if (string.IsNullOrWhiteSpace(project_name))
+                throw new ArgumentException("Le nom du canal ne peut pas être vide.", nameof(project_name));
+
+            var project = new Project
+            {
+                name = project_name,
+                description = project_desc
+            };
+
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+
+                    string query = @"UPDATE Project SET project_name = @Name , project_desc = @Description WHERE project_id = @Id";
+
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Id", project_id);
+                    command.Parameters.AddWithValue("@Name", project_name);
+                    command.Parameters.AddWithValue("@Description", project_desc);
+
+                    command.ExecuteNonQuery();
+                    project.id = project_id;
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog(ex.Message);
+
+            }
+            ;
+            return project;
+        }
+
+        public List<Project> GetAll()
+        {
+            var projects = new List<Project>();
+
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+
+                    const string query = @"
+                        SELECT project_id, project_name, project_desc
+                        FROM Project;";
+
+                    using var command = new SqlCommand(query, connection);
+                    using var reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        var project = new Project
+                        {
+                            id = reader.IsDBNull(0) ? null : reader.GetInt32(0),
+                            name = reader.IsDBNull(1) ? null : reader.GetString(1),
+                            description = reader.IsDBNull(2) ? null : reader.GetString(2)
+                        };
+
+                        projects.Add(project);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog($"Erreur lors de la récupération des projets : {ex.Message}");
+            }
+            return projects;
         }
     }
 }

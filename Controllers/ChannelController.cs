@@ -1,27 +1,28 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Thiskord_Back.Models.Project;
+using Thiskord_Back.Models.Channel;
 using Thiskord_Back.Services;
 
 namespace Thiskord_Back.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectController : ControllerBase
+    public class ChannelController : ControllerBase
     {
-        private ProjectService _projectService;
+        private ChannelService _channelService;
 
-        public ProjectController(ProjectService projectService)
+        public ChannelController(ChannelService channelService)
         {
-            _projectService = projectService;
+            _channelService = channelService;
         }
 
         [HttpPost("create")]
-        public IActionResult CreateProject([FromBody] ProjectRequest req)
+        
+        public IActionResult CreateChannel([FromBody] ChannelRequest req)
         {
             try
             {
-                _projectService.Create(req.name, req.description);
+                _channelService.Create(req.name, req.description);
                 return Ok(new { resultat = "success" });
 
             }
@@ -31,11 +32,11 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteProject(int id)
+        public IActionResult DeleteChannel(int id)
         {
             try
             {
-                _projectService.DeleteById(id);
+                _channelService.DeleteById(id);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)
@@ -44,26 +45,12 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpPut("{id:int}")]
-        public IActionResult UpdateProject([FromBody] ProjectRequest req, int id)
+        public IActionResult UpdateChannel([FromBody] ChannelRequest req, int id)
         {
             try
             {
-                _projectService.Update(id, req.name, req.description);
+                _channelService.Update(id, req.name, req.description);
                 return Ok(new { resultat = "success" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
-            }
-        }
-        
-        [HttpGet("all")]
-        public IActionResult GetAllProjects()
-        {
-            try
-            {
-                var projects = _projectService.GetAll();
-                return Ok(projects);
             }
             catch (Exception ex)
             {
