@@ -4,9 +4,9 @@ namespace Thiskord_Back.Models.Auth
 
     public class User
     {
-        private string user_name { get; set; }
-        private string user_mail { get; set; }
-        private string user_picture { get; set; }
+        public string user_name { get; set; }
+        public string user_mail { get; set; }
+        public string user_picture { get; set; }
 
         public User(string _user_name, string _user_mail, string _user_picture)
         {
@@ -17,15 +17,15 @@ namespace Thiskord_Back.Models.Auth
     }
     public class AuthenticatedUser
     {
-        private User user { get; set; }
-        private int[] servers;
+        public User user { get; set; }
+        public string token { get; set; }
 
 
         // constructeur avec objet User | On part du principe que l'on a fait appel au constructeur User en amont
-        public AuthenticatedUser(User _user, int[] servers)
+        public AuthenticatedUser(User _user, string _token)
         {
             this.user = _user;
-            this.servers = servers;
+            this.token = _token;
         }
 
     }

@@ -23,9 +23,8 @@ namespace Thiskord_Back.Controllers
         [HttpPost("auth")]
         public IActionResult authentification([FromBody] AuthRequest req)
         {
-            string res = _authService.AuthLogin(req.user_auth, req.password);
-            //return Ok(_authService.AuthLogin(req.user_auth, req.password));
-            return Ok(_jsonService.toJson(res));
+            AuthenticatedUser res = _authService.AuthLogin(req.user_auth, req.password);
+            return Ok(res);
         }
     }
 }
