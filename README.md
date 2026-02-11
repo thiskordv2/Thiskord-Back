@@ -27,7 +27,7 @@ Dans ce compose, on initialise la base de données une première fois en créant
 
 Le fichier crée automatiquement un utilisateur EMRE avec le mot de passe EMRE \
 
-⚠️⚠️⚠️ Attention, ne jamais lancé cette commande deux fois de suite, car elle va essayer de recrée la base existante et faire planter le container
+⚠️Attention, ne jamais lancé cette commande deux fois de suite, car elle va essayer de recrée la base existante et faire planter le container
 
 ### Pour les lancements suivants :
 ``` 
