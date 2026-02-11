@@ -14,7 +14,7 @@ services:
       - ConnectionStrings__DefaultConnection=Server=database;Database=thiskord;User Id=sa;Password=MonSuperMotDePasse123!;TrustServerCertificate=True;
     depends_on:
       database.configurator:
-        condition: service_completed_successfully 
+        condition: service_completed_successfully
     networks:
       - backend_network
 
@@ -23,10 +23,10 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=MonSuperMotDePasse123!
-    volumes:  
+    volumes:
       - database_data:/var/opt/mssql
     ports:
-      - "1433:1433"
+      - "1533:1433"
     networks:
       - backend_network
     healthcheck:
@@ -43,7 +43,7 @@ services:
       database:
         condition: service_healthy
     volumes:
-      - ./Thiskord_db.sql:/init.sql 
+      - ./Thiskord_db.sql:/init.sql
     networks:
       - backend_network
     command: >

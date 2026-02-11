@@ -4,41 +4,30 @@ Ceci est le BackEnd de notre projet en C#
 
 ## En mode développement avec mise à jour sur sauvegarde :
 
-### A savoir pour n'importe quelle lancement des containers :
-Docker met à jour le container à chaque fois que l'on sauvegarde des fichiers de notre projet. \
-Si cela ne fonctionne pas, faire Ctrl + R sur terminal qui "watch" le container.
+### A savoir :
+Pour démarrer les machines :
+``` 
+docker compose up
+```
+Pour désactiver les logs et messages au démarrage (Pour les premiers démarrages, il est préférable de les laisser pour voir les erreurs éventuelles) :
+```
+docker compose up -d
+```
+Au démarrage des containers, Docker va créer une base de données avec un jeu de données par défaut.
+Comme utilisateur par défaut, on a EMRE avec le mot de passe EMRE. \
+Docker met à jour le container à chaque fois que l'on sauvegarde des fichiers de notre projet, il watch les changements de code C#
 
 Pour arrêter les machines :
 ```
-docker compose -f 'nom-du-fichier-docker-compose.yml' down
+docker compose down
 ```
 
 Pour arrêter et supprimez les volumes ( dont la base de données ) :
 ```
 
-docker compose -f 'nom-du-fichier-docker-compose.yml' down -v
+docker compose down -v
 ```
 
-### Pour le premier lancement :
-```
-docker compose -f docker-compose.devinit.yml up
-```
-Dans ce compose, on initialise la base de données une première fois en créant la nôtre grâce au service database.configurator et au fichier Thiskord_db.sql \
-
-Le fichier crée automatiquement un utilisateur EMRE avec le mot de passe EMRE \
-
-⚠️Attention, ne jamais lancé cette commande deux fois de suite, car elle va essayer de recrée la base existante et faire planter le container
-
-### Pour les lancements suivants :
-``` 
-docker compose -f docker-compose.dev.yml up
-```
-
-### Pour les lancements sur ASIO :
-Comme on a pas besoin de crée la base de données, on doit seulement faire :
-```
-docker compose -f docker-compose.devasio.yml up
-```
 ## En mode production :
 
 Dans un premier temps, on build notre image :
