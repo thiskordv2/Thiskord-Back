@@ -56,6 +56,7 @@ namespace Thiskord_Back.Services
 
             return channel;
         }
+
         public void DeleteById(int channelId)
         {
             try
@@ -74,6 +75,8 @@ namespace Thiskord_Back.Services
                 logService.CreateLog($"Error in DeleteById: {ex.Message}");
                 throw;
             }
+        }
+
         public Channel Update(int channel_id, string channel_name, string channel_desc)
         {
 
@@ -123,7 +126,7 @@ namespace Thiskord_Back.Services
 
                     string query = @"SELECT channel_id, channel_name, channel_desc 
                                      FROM Channel 
-                                     WHERE project_id = @ProjectId";
+                                     WHERE id_project = @ProjectId";
 
                     using var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@ProjectId", projectId);
