@@ -19,6 +19,7 @@ builder.Services.AddScoped<Thiskord_Back.Services.AuthService>();
 builder.Services.AddScoped<Thiskord_Back.Services.JsonService>();
 builder.Services.AddScoped<Thiskord_Back.Services.LogService>();
 builder.Services.AddScoped<Thiskord_Back.Services.ProjectService>();
+builder.Services.AddScoped<Thiskord_Back.Services.InscriptionService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
