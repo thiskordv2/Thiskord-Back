@@ -57,5 +57,18 @@ namespace Thiskord_Back.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
             }
         }
+        [HttpGet("project/{projectId:int}")]
+        public IActionResult GetChannelsByProjectId(int projectId)
+        {
+            try
+            {
+                var channels = _channelService.GetChannelsByProjectId(projectId);
+                return Ok(channels);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
+            }
+        }
     }
 }

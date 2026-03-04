@@ -61,10 +61,7 @@ namespace Thiskord_Back.Services
                     signingCredentials: creds
                 ); 
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-                Console.WriteLine(tokenString);
                 return new AuthenticatedUser(user, tokenString);
-
-
             }
             else
             {

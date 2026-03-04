@@ -47,16 +47,16 @@ namespace Thiskord_Back.Services
                     channel.id = (int)command.ExecuteScalar();
 
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
-                
-            };
+                logService.CreateLog($"Error in Create: {ex.Message}");
+                throw;
+            }
+
             return channel;
-
-
-       
         }
+
         public void DeleteById(int channelId)
         {
             try
@@ -72,9 +72,11 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
+                logService.CreateLog($"Error in DeleteById: {ex.Message}");
+                throw;
             }
         }
+
         public Channel Update(int channel_id, string channel_name, string channel_desc)
         {
 
@@ -106,14 +108,49 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
-
+                logService.CreateLog($"Error in Update: {ex.Message}");
+                throw;
             }
-            ;
+
             return channel;
+        }
+        public List<Channel> GetChannelsByProjectId(int projectId)
+        {
+            var channels = new List<Channel>();
 
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
 
+                    string query = @"SELECT channel_id, channel_name, channel_desc 
+                                     FROM Channel 
+                                     WHERE id_project = @ProjectId";
 
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ProjectId", projectId);
+
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var channel = new Channel
+                        {
+                            id = (int)reader["channel_id"],
+                            name = reader["channel_name"].ToString(),
+                            description = reader["channel_desc"].ToString()
+                        };
+                        channels.Add(channel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
+                throw;
+            }
+
+            return channels;
         }
     }
 }
