@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Thiskord_Back.Models.Auth;
+using Thiskord_Back.Models.Account;
 using Microsoft.Extensions.Configuration;
 
 namespace Thiskord_Back.Services
@@ -14,13 +15,11 @@ namespace Thiskord_Back.Services
     public class AuthService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly JsonService _jsonService;
         private readonly IConfiguration _configuration;
 
-        public AuthService(IDbConnectionService dbService, JsonService jsonService, IConfiguration configuration)
+        public AuthService(IDbConnectionService dbService, IConfiguration configuration)
         {
             _dbService = dbService;
-            _jsonService = jsonService;
             _configuration = configuration;
         }
         public AuthenticatedUser AuthLogin(string user_auth, string user_password)
@@ -49,7 +48,7 @@ namespace Thiskord_Back.Services
                 using var res1 = command1.ExecuteReader();
                 res1.Read();
                 user_id = res1.GetInt32(0);
-                User user = new User(res1.GetString(1), res1.GetString(2), res1.GetString(3));
+                UserAccount user = new UserAccount(res.GetInt32(0), res1.GetString(1), res1.GetString(2), res1.GetString(3));
                 res1.Close();
                 var claims = new[] { new Claim(ClaimTypes.Name, user_auth) }; 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)); 
