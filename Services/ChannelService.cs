@@ -50,14 +50,11 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
-
+                logService.CreateLog($"Error in Create: {ex.Message}");
+                throw;
             }
-            ;
+
             return channel;
-
-
-
         }
         public void DeleteById(int channelId)
         {
@@ -74,9 +71,9 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
+                logService.CreateLog($"Error in DeleteById: {ex.Message}");
+                throw;
             }
-        }
         public Channel Update(int channel_id, string channel_name, string channel_desc)
         {
 
@@ -108,14 +105,11 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
-
+                logService.CreateLog($"Error in Update: {ex.Message}");
+                throw;
             }
-            ;
+
             return channel;
-
-
-
         }
         public List<Channel> GetChannelsByProjectId(int projectId)
         {
@@ -149,7 +143,8 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog(ex.Message);
+                logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
+                throw;
             }
 
             return channels;
