@@ -20,18 +20,18 @@ namespace Thiskord_Back.Services
         public Object toObject(string obj, string objet)
         {
             Object returnObject = null;
-            switch (objet)
-            {
-                case "0":
-                    returnObject = JsonSerializer.Deserialize<User>(obj);
-                    break;
-                case "1":
-                    returnObject = JsonSerializer.Deserialize<AuthenticatedUser>(obj);
-                    break;
-                default: 
-                    returnObject = null;
-                    break;
-            }
+            //switch (objet)
+            //{
+            //    case "0":
+            //        returnObject = JsonSerializer.Deserialize<User>(obj);
+            //        break;
+            //    case "1":
+            //        returnObject = JsonSerializer.Deserialize<AuthenticatedUser>(obj);
+            //        break;
+            //    default: 
+            //        returnObject = null;
+            //        break;
+            //}
             return returnObject;
         }
     }

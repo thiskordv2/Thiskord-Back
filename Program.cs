@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Thiskord_Back.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,12 +15,12 @@ builder.Services.AddOpenApi();
 // Init du paquet SignalR (Broadcast)
 builder.Services.AddSignalR();
 
-builder.Services.AddScoped<Thiskord_Back.Services.IDbConnectionService, Thiskord_Back.Services.DBService>();
-builder.Services.AddScoped<Thiskord_Back.Services.AuthService>();
-builder.Services.AddScoped<Thiskord_Back.Services.JsonService>();
-builder.Services.AddScoped<Thiskord_Back.Services.LogService>();
-builder.Services.AddScoped<Thiskord_Back.Services.ProjectService>();
-builder.Services.AddScoped<Thiskord_Back.Services.InscriptionService>();
+builder.Services.AddScoped<IDbConnectionService, DBService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JsonService>();
+builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<AccountService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -38,12 +39,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddScoped<Thiskord_Back.Services.ChannelService>();
+builder.Services.AddScoped<ChannelService>();
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -52,6 +51,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
+app.UseAuthentication();
 
 app.UseHttpsRedirection();
 
