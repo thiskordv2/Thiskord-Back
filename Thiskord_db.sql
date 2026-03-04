@@ -22,6 +22,11 @@ CREATE TABLE dbo.Account
     modified_at DATETIME2
 );
 END
+ELSE
+BEGIN
+    -- Réinitialiser le seed d'identité à 0 pour que le prochain ID soit 1
+    DBCC CHECKIDENT ('dbo.Account', RESEED, 0);
+END
 GO
 
 -- Table Project
