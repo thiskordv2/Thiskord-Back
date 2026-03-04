@@ -47,15 +47,17 @@ namespace Thiskord_Back.Services
                     channel.id = (int)command.ExecuteScalar();
 
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logService.CreateLog(ex.Message);
-                
-            };
+
+            }
+            ;
             return channel;
 
 
-       
+
         }
         public void DeleteById(int channelId)
         {
@@ -114,6 +116,43 @@ namespace Thiskord_Back.Services
 
 
 
+        }
+        public List<Channel> GetChannelsByProjectId(int projectId)
+        {
+            var channels = new List<Channel>();
+
+            try
+            {
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+
+                    string query = @"SELECT channel_id, channel_name, channel_desc 
+                                     FROM Channel 
+                                     WHERE project_id = @ProjectId";
+
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ProjectId", projectId);
+
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var channel = new Channel
+                        {
+                            id = (int)reader["channel_id"],
+                            name = reader["channel_name"].ToString(),
+                            description = reader["channel_desc"].ToString()
+                        };
+                        channels.Add(channel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog(ex.Message);
+            }
+
+            return channels;
         }
     }
 }
