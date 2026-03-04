@@ -14,13 +14,11 @@ namespace Thiskord_Back.Services
     public class AuthService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly JsonService _jsonService;
         private readonly IConfiguration _configuration;
 
-        public AuthService(IDbConnectionService dbService, JsonService jsonService, IConfiguration configuration)
+        public AuthService(IDbConnectionService dbService, IConfiguration configuration)
         {
             _dbService = dbService;
-            _jsonService = jsonService;
             _configuration = configuration;
         }
         public AuthenticatedUser AuthLogin(string user_auth, string user_password)
@@ -62,10 +60,7 @@ namespace Thiskord_Back.Services
                     signingCredentials: creds
                 ); 
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-                Console.WriteLine(tokenString);
                 return new AuthenticatedUser(user, tokenString);
-
-
             }
             else
             {

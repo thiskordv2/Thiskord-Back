@@ -12,12 +12,10 @@ namespace Thiskord_Back.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
-        private readonly JsonService _jsonService;
 
-        public AuthController(AuthService authService, JsonService jsonService)
+        public AuthController(AuthService authService)
         {
             _authService = authService;
-            _jsonService = jsonService;
         }
 
         [HttpPost("auth")]
