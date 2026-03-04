@@ -27,7 +27,12 @@
             this.user_mail = _user_mail;
             this.user_picture = _user_picture;
         }
-
-
+        public UserAccount(string _user_name, string _user_mail, string _user_password, string _user_picture)
+        {
+            this.user_name = _user_name;
+            this.user_mail = _user_mail;
+            this.user_password = _user_password;
+            this.user_picture = _user_picture;
+        }
     }
 }
