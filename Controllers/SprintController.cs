@@ -17,22 +17,61 @@ namespace Thiskord_Back.Controllers
         [HttpPost("create/sprint")]
         public IActionResult createSprint([FromBody] Sprint req)
         {
-            _sprintService.createSprint(req);
-            return Ok();
+            try
+            {
+                _sprintService.createSprint(req);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         
         [HttpDelete("{id:int}")]
         public IActionResult deleteSprint(int id)
         {
-            int res = _sprintService.deleteSprint(id);
-            return Ok();
+            try
+            {
+                int res = _sprintService.deleteSprint(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpGet("sprint/{id:int}")]
         public IActionResult getSprint(int id)
         {
-            return Ok(_sprintService.getSprint(id));
+            try
+            {
+                Sprint res = new Sprint();
+                res = _sprintService.getSprint(id);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPatch("sprint")]
+        public IActionResult updateSprint([FromBody] Sprint req)
+        {
+            try
+            {
+                int res = _sprintService.updateSprint(req);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

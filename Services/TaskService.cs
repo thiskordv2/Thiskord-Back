@@ -82,7 +82,7 @@ namespace Thiskord_Back.Services
             List<SprintTask> res = new List<SprintTask>(); 
             var conn = _dbService.CreateConnection();
             conn.Open();
-            string query = "SELECT * FROM Task WHERE id_project_task = @idProject;";
+            string query = "SELECT * FROM Task WHERE id_project_task = @idProject AND is_subtask = false;";
             var command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("idProject", id);
             var reader = command.ExecuteReader();
