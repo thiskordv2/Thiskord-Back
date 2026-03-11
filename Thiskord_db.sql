@@ -8,6 +8,10 @@ GO
 USE thiskord;
 GO
 
+-- Désactiver le cache d'identité pour éviter les "trous" dans les IDs
+ALTER DATABASE SCOPED CONFIGURATION SET IDENTITY_CACHE = OFF;
+GO
+
 -- Table Account
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Account' AND schema_id = SCHEMA_ID('dbo'))
 BEGIN
@@ -21,10 +25,6 @@ CREATE TABLE dbo.Account
     created_at DATETIME2 DEFAULT GETDATE(),
     modified_at DATETIME2
 );
-END
-ELSE
-BEGIN
-    -- Réinitialiser le seed d'identité à 0 pour que le prochain ID soit 1
     DBCC CHECKIDENT ('dbo.Account', RESEED, 0);
 END
 GO
