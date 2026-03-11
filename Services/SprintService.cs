@@ -17,6 +17,9 @@ namespace Thiskord_Back.Services
         {
             var conn = _dbService.CreateConnection();
             conn.Open();
+
+            
+
             string timestamp = new DateTime().ToString("yyyyMMddHHmmssffff");
             string query = "INSERT INTO Sprint (sprint_goal, sprint_begin_date, sprint_end_date, created_at, modified_at) " 
                                 + "VALUES (@sprint_goal, @sprint_begin_date, @sprint_end_date, @created_at, @modified_at)";
@@ -44,19 +47,33 @@ namespace Thiskord_Back.Services
 
         public int updateSprint(Sprint req) 
         {
-            return 1;
+            int res = 0;
+            string timestamp = new DateTime().ToString("yyyyMMddHHmmssffff");
+            var conn = _dbService.CreateConnection();
+            conn.Open();
+            string query = "UPDATE FROM Sprint SET (sprint_goal, sprint_begin_date, sprint_end_date, created_at, modified_at) "                            
+                         + "VALUES (@sprint_goal, @sprint_begin_date, @sprint_end_date, @created_at, @modified_at)";
+            var command = new SqlCommand(query, conn);
+            command.Parameters.AddWithValue("@sprint_goal", req.sprint_goal);
+            command.Parameters.AddWithValue("@sprint_begin_date", req.sprint_begin_date);
+            command.Parameters.AddWithValue("@sprint_end_date", req.sprint_end_date);
+            command.Parameters.AddWithValue("@modified_at", timestamp);
+            command.Parameters.AddWithValue("@created_at", timestamp);
+            res = command.ExecuteNonQuery();
+            return res;
         }
 
         public Sprint getSprint(int id)
         {
             var conn = _dbService.CreateConnection();
+            conn.Open();
             string query = "SELECT * FROM Sprint WHERE sprint_id = @sprint_id";
             var command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("@sprint_id", id);
             var reader = command.ExecuteReader();
             reader.Read();
             Sprint res = new Sprint(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3));
-            return new Sprint(1, "","","");
+            return res;
         }
 
     }

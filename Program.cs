@@ -21,6 +21,8 @@ builder.Services.AddScoped<JsonService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<SprintService>();
+builder.Services.AddScoped<TaskService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

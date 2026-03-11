@@ -14,10 +14,11 @@ namespace Thiskord_Back.Controllers
             _sprintService = sprintService;
         }
 
-        [HttpPost("sprint")]
-        public void createSprint([FromBody] Sprint req)
+        [HttpPost("create/sprint")]
+        public IActionResult createSprint([FromBody] Sprint req)
         {
-
+            _sprintService.createSprint(req);
+            return Ok();
         }
 
         
@@ -26,6 +27,12 @@ namespace Thiskord_Back.Controllers
         {
             int res = _sprintService.deleteSprint(id);
             return Ok();
+        }
+
+        [HttpGet("sprint/{id:int}")]
+        public IActionResult getSprint(int id)
+        {
+            return Ok(_sprintService.getSprint(id));
         }
 
     }
