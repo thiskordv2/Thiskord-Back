@@ -50,7 +50,7 @@ namespace Thiskord_Back.Services
                 user_id = res1.GetInt32(0);
                 UserAccount user = new UserAccount(res1.GetInt32(0), res1.GetString(1), res1.GetString(2),res1.GetString(3));
                 res1.Close();
-                var claims = new[] { new Claim(ClaimTypes.Name, user_auth) }; 
+                var claims = new[] { new Claim(ClaimTypes.NameIdentifier, user_id.ToString()), new Claim(ClaimTypes.Name, user_auth) }; 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)); 
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); 
                 var token = new JwtSecurityToken(
