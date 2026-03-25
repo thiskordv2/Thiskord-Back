@@ -1,8 +1,8 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Thiskord_Back.Services;
-
 namespace Thiskord_Back.Hubs
 {
     public class ChatHub : Hub
