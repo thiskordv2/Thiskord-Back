@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Thiskord_Back.Services;
+
 namespace Thiskord_Back.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
         private readonly IDbConnectionService _dbService;
@@ -16,10 +18,8 @@ namespace Thiskord_Back.Hubs
         
         public async Task JoinChannel(int channelId)
         {
-            // Connection de l'utilisateur au channel via l'id
             await Groups.AddToGroupAsync(Context.ConnectionId, channelId.ToString());
             
-            // Récupération de l'historique des messages du channel
             using var conn = _dbService.CreateConnection();
             await conn.OpenAsync();
             
@@ -34,16 +34,14 @@ namespace Thiskord_Back.Hubs
             WHERE m.id_channel_author = @channelId
             ORDER BY m.created_at ASC, m.message_id ASC;";    
             
-            // Execution de la requête
             using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@channelId", channelId);
             
-            // Lecture de tous les messages
             using var reader = await cmd.ExecuteReaderAsync();
             var history = new List<object>();
-            // Ajout de tous les messages à un tableau avec le text, l'auteur et la date de création
             while (await reader.ReadAsync())
             {
+                var id = reader.GetInt32(0);
                 var text = reader.IsDBNull(1) ? "" : reader.GetString(1);
                 var createdAt = reader.IsDBNull(2) ? DateTime.UtcNow : reader.GetDateTime(2);
                 var username = reader.IsDBNull(3) ? "Unknown user" : reader.GetString(3);
@@ -56,16 +54,13 @@ namespace Thiskord_Back.Hubs
 
                 history.Add(new
                 {
+                    id,
                     user = username,
                     text,
                     dateTime = parisTime.ToString("dd/MM HH:mm")
                 });
             }
-            // Envoie de l'historique de message
             await Clients.Caller.SendAsync("LoadMessages", history);
-            
-            // OPT : Message pour prévenir que quelqu'un vient de rejoindre
-            await Clients.Group(channelId.ToString()).SendAsync("UserJoined", Context.User?.Identity?.Name ?? "Unknown user", $"has joined the channel {channelId}");
         }
 
         public async Task LeaveChannel(int channelId)
@@ -98,6 +93,21 @@ namespace Thiskord_Back.Hubs
 
             await Clients.Group(channelId.ToString())
                 .SendAsync("ReceiveMessage", username, text, dateTime);
+        }
+
+        public async Task DeleteMessage(int channelId, int messageId)
+        {
+            using var conn = _dbService.CreateConnection();
+            await conn.OpenAsync();
+
+            const string query = @"DELETE FROM Message WHERE message_id = @message_id AND id_channel_author = @channel_id";
+
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@message_id", messageId);
+            cmd.Parameters.AddWithValue("@channel_id", channelId);
+            await cmd.ExecuteNonQueryAsync();
+            await Clients.Group(channelId.ToString())
+                .SendAsync("DeleteMessage", messageId);
         }
     }
 }

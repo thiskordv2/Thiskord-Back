@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Thiskord_Back.Models.Channel;
 using Thiskord_Back.Services;
@@ -7,6 +8,7 @@ namespace Thiskord_Back.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ChannelController : ControllerBase
     {
         private ChannelService _channelService;
