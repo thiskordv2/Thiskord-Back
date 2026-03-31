@@ -18,7 +18,7 @@ namespace Thiskord_Back.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] JsonElement req)
+        public async Task<IActionResult> Register([FromBody] JsonElement req)
         {
             try
             {
@@ -36,8 +36,8 @@ namespace Thiskord_Back.Controllers
                     }
                 }
 
-                _inscriptionService.InscriptionUser(userName, userMail, password, userPicture);
-                return Ok(new { resultat = "success" });
+                var createdUser = await _inscriptionService.InscriptionUser(userName, userMail, password, userPicture);
+                return Ok(createdUser);
             }
             catch (Exception ex)
             {

@@ -15,14 +15,13 @@ namespace Thiskord_Back.Services
             _logService = logService;
         }
 
-        public async Task<string> InscriptionUser(string user_name, string user_mail, string user_password, string user_picture)
+        public async Task<UserAccount> InscriptionUser(string user_name, string user_mail, string user_password, string user_picture)
         {
             var pwd = BCrypt.Net.BCrypt.HashPassword(user_password);
             var user = new UserAccount(user_name, user_mail, pwd, user_picture);
-
             try
             {
-                using (var connection = _dbService.CreateConnection())
+                await using (var connection = _dbService.CreateConnection())
                 {
                     connection.Open();
 
@@ -35,16 +34,17 @@ namespace Thiskord_Back.Services
                     command.Parameters.AddWithValue("@Mail", user.user_mail);
                     command.Parameters.AddWithValue("@Password", user.user_password);
                     command.Parameters.AddWithValue("@Picture", user.user_picture);
-
+                    Console.WriteLine(command);
                     user.user_id = (int)command.ExecuteScalar();
                 }
             }
             catch (Exception ex)
             {
                 _logService.CreateLog(ex.Message);
+                throw;
             }
-
-            return "User registered successfully";
+            
+            return user;
         }
     }
 }  
