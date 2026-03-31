@@ -34,7 +34,6 @@ namespace Thiskord_Back.Services
                     command.Parameters.AddWithValue("@Mail", user.user_mail);
                     command.Parameters.AddWithValue("@Password", user.user_password);
                     command.Parameters.AddWithValue("@Picture", user.user_picture);
-                    Console.WriteLine(command);
                     user.user_id = (int)command.ExecuteScalar();
                 }
             }
