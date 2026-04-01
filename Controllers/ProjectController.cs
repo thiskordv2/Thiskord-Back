@@ -50,7 +50,13 @@ namespace Thiskord_Back.Controllers
         {
             try
             {
-                _projectService.Update(id, req.name, req.description);
+                Project updateProject = new Project
+                {
+                    id = req.id,
+                    name = req.name,
+                    description = req.description
+                };
+                _projectService.Update(updateProject);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)

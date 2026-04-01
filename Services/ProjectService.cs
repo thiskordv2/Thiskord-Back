@@ -75,18 +75,12 @@ namespace Thiskord_Back.Services
                 logService.CreateLog(ex.Message);
             }
         }
-        public Project Update(int project_id, string project_name, string project_desc)
+        public Project Update(Project updatedProject)
         {
 
-            if (string.IsNullOrWhiteSpace(project_name))
-                throw new ArgumentException("Le nom du canal ne peut pas être vide.", nameof(project_name));
-
-            var project = new Project
-            {
-                name = project_name,
-                description = project_desc
-            };
-
+            if (string.IsNullOrWhiteSpace(updatedProject.name))
+                throw new ArgumentException("Le nom du canal ne peut pas être vide.", nameof(updatedProject.name));
+            
             try
             {
                 using (var connection = _dbService.CreateConnection())
@@ -96,12 +90,11 @@ namespace Thiskord_Back.Services
                     string query = @"UPDATE Project SET project_name = @Name , project_desc = @Description WHERE project_id = @Id";
 
                     using var command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@Id", project_id);
-                    command.Parameters.AddWithValue("@Name", project_name);
-                    command.Parameters.AddWithValue("@Description", project_desc);
+                    command.Parameters.AddWithValue("@Id", updatedProject.id);
+                    command.Parameters.AddWithValue("@Name", updatedProject.name);
+                    command.Parameters.AddWithValue("@Description", updatedProject.description);
 
                     command.ExecuteNonQuery();
-                    project.id = project_id;
                 }
             }
             catch (Exception ex)
@@ -110,7 +103,7 @@ namespace Thiskord_Back.Services
 
             }
             ;
-            return project;
+            return updatedProject;
         }
 
         public List<Project> GetAll()
