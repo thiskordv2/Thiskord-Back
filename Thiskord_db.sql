@@ -98,6 +98,7 @@ CREATE TABLE dbo.Sprint
     sprint_begin_date VARCHAR(255),
     sprint_end_date VARCHAR(255),
     sprint_status VARCHAR(50) DEFAULT 'To Do',
+    id_project_sprint INT NULL,
     created_at VARCHAR(255),
     modified_at VARCHAR(255),
     CONSTRAINT fk_id_project_sprint FOREIGN KEY (id_project_sprint) REFERENCES dbo.Project(project_id) ON DELETE SET NULL
