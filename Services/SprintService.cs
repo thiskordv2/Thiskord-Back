@@ -67,9 +67,9 @@ namespace Thiskord_Back.Services
         {
             var conn = _dbService.CreateConnection();
             conn.Open();
-            string query = "SELECT * FROM Sprint WHERE sprint_id = @sprint_id";
+            string query = "SELECT * FROM Sprint WHERE id_project_sprint = @project_id";
             var command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("@sprint_id", id);
+            command.Parameters.AddWithValue("@project_id", id);
             var reader = command.ExecuteReader();
             reader.Read();
             Sprint res = new Sprint(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3));
