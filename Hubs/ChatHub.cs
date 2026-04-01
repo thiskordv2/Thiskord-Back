@@ -79,20 +79,22 @@ namespace Thiskord_Back.Hubs
 
             const string query = @"
             INSERT INTO dbo.Message (id_channel_author, id_author, message_content)
+            OUTPUT INSERTED.message_id
             VALUES (@channelId, @userId, @text);";
 
             using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@channelId", channelId);
             cmd.Parameters.AddWithValue("@userId", userId);
             cmd.Parameters.AddWithValue("@text", text);
-            await cmd.ExecuteNonQueryAsync();
+            var id = (int)await cmd.ExecuteScalarAsync();
+            Console.Write($"Message inserted with ID: {id}");
 
             var username = Context.User?.Identity?.Name ?? $"user#{userId}";
             var parisTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
             var dateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, parisTz).ToString("dd/MM HH:mm");
-
+            
             await Clients.Group(channelId.ToString())
-                .SendAsync("ReceiveMessage", username, text, dateTime);
+                .SendAsync("ReceiveMessage", id, username, text, dateTime);
         }
 
         public async Task DeleteMessage(int channelId, int messageId)
