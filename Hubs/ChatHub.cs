@@ -109,5 +109,19 @@ namespace Thiskord_Back.Hubs
             await Clients.Group(channelId.ToString())
                 .SendAsync("DeleteMessage", messageId);
         }
+        public async Task EditMessage(int channelId, int messageId, string newText)
+        {
+            using var conn = _dbService.CreateConnection();
+            await conn.OpenAsync();
+            const string query = @"UPDATE Message SET message_content = @newText WHERE message_id = @message_id AND id_channel_author = @channel_id";
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@newText", newText);
+            cmd.Parameters.AddWithValue("@message_id", messageId);
+            cmd.Parameters.AddWithValue("@channel_id", channelId);
+            await cmd.ExecuteNonQueryAsync();
+            await Clients.Group(channelId.ToString())
+                .SendAsync("EditMessage", messageId, newText);
+
+        }
     }
 }
