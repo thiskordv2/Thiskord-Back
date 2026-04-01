@@ -21,6 +21,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JsonService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<InscriptionService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
