@@ -16,5 +16,8 @@ namespace Thiskord_Back.Models.Channel
 
         [JsonPropertyName("description")]
         public string description { get; set; }
+    
+        [JsonPropertyName("projectId")]
+        public int projectId { get; set; }
     }
 }

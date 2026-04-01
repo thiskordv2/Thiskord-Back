@@ -18,7 +18,7 @@ namespace Thiskord_Back.Services
             this._dbService = dbService;
             this.logService = logService;
         }
-        public Channel Create(string channel_name, string channel_desc)
+        public Channel Create(string channel_name, string channel_desc, int projectId)
         {
 
             if (string.IsNullOrWhiteSpace(channel_name))
@@ -36,13 +36,14 @@ namespace Thiskord_Back.Services
                 {
                     connection.Open();
 
-                    string query = @"INSERT INTO Channel (channel_name, channel_desc) 
-                                     VALUES (@Name, @Description); 
+                    string query = @"INSERT INTO Channel (channel_name, channel_desc, id_project) 
+                                     VALUES (@Name, @Description, @ProjectId); 
                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
                     using var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Name", channel_name);
                     command.Parameters.AddWithValue("@Description", channel_desc);
+                    command.Parameters.AddWithValue("@ProjectId", projectId);
 
                     channel.id = (int)command.ExecuteScalar();
 

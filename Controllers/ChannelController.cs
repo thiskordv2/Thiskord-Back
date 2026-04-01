@@ -24,7 +24,7 @@ namespace Thiskord_Back.Controllers
         {
             try
             {
-                _channelService.Create(req.name, req.description);
+                _channelService.Create(req.name, req.description, req.projectId);
                 return Ok(new { resultat = "success" });
 
             }
