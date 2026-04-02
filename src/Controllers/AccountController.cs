@@ -25,15 +25,15 @@ namespace Thiskord_Back.Controllers
             return Ok(res);
         }
 
-        [HttpPost("account")]
-        public IActionResult patchAccount([FromBody] UserAccount req)
+        [HttpPut("account")]
+        public IActionResult patchAccount([FromBody] UpdateAccountRequest req)
         {
             _accountService.patchAccount(req);
             return Ok();
         }
 
-        [HttpPost("account-password")]
-        public IActionResult patchAccountPassword([FromBody] UserAccount req)
+        [HttpPut("account-password")]
+        public IActionResult patchAccountPassword([FromBody] UpdatePasswordRequest req)
         {
             return Ok(_accountService.patchAccountPassword(req));
         }
