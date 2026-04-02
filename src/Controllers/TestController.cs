@@ -20,13 +20,6 @@ namespace Thiskord_Back.Controllers
             _logService = logService;
         }
 
-        [HttpPost("insert")]
-        public IActionResult InsertTest()
-        {
-            _dbService.Test();
-            return Ok(new { message = "Insertion réussie !" });
-        }
-
         [HttpPost("connard")]
         public IActionResult testing()
         {

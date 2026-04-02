@@ -2,11 +2,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0@sha256:3fcf6f1e809c0553f9feb222369f58749af
 WORKDIR /App
 
 # Copy the .csproj for dependancies
-COPY Thiskord_Back.csproj ./
+COPY src/Thiskord_Back.csproj ./src/
 # Restore as distinct layers
 RUN dotnet restore
 # Copy the project 
-COPY . ./
+COPY src/ ./src/
 # Build and publish a release
 RUN dotnet publish -o out
 
