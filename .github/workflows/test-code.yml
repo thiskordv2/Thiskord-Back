@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main, develop]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  
 jobs:
   builds:
     runs-on: ubuntu-latest
@@ -33,10 +30,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             9.0.x
@@ -51,4 +48,4 @@ jobs:
       - name: Test
         env:
           ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=thiskord;User Id=sa;Password=${{ secrets.DB_PASSWORD }};TrustServerCertificate=True;"
-        run: dotnet test --no-build
+        run: dotnet test --no-build --configuration Release
