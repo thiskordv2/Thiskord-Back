@@ -55,8 +55,7 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             int channelId = 2;
             string newChannelName = "NewChannelName";
             string newChannelDescription = "NewChannelDescription";
-            int projectId = 1;
-            var res = _channelService.Update(projectId, newChannelName, newChannelDescription);
+            var res = _channelService.Update(channelId, newChannelName, newChannelDescription);
             res.Should().BeOfType<Channel>();
             res.name.Should().Be(newChannelName);
             res.description.Should().Be(newChannelDescription);

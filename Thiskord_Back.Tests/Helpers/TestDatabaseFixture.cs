@@ -1,70 +1,71 @@
-using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 namespace Thiskord_Back.Tests.Helpers
 {
     public class TestDatabaseFixture : IDisposable
     {
         public string ConnectionString { get; }
-        private readonly SqlConnection _dbConn;
+        private readonly string _dbName;
+        private readonly string _masterConnectionString;
 
         public TestDatabaseFixture()
         {
-            string dbName = $"Thiskord_Test_{Guid.NewGuid():N}";
+            _dbName = $"Thiskord_Test_{Guid.NewGuid():N}";
 
-            string baseConnectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-                ?? "Server=localhost,1433;User Id=sa;Password=YourLocalPassword;TrustServerCertificate=True;";
+            var baseConnectionString =
+                Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                ?? "Server=localhost,1433;User Id=sa;Password=YourLocalPassword;TrustServerCertificate=True;Encrypt=False;";
 
-            var masterConnectionString = Regex.Replace(
-                baseConnectionString,
-                @"Database=[^;]+;?",
-                "",
-                RegexOptions.IgnoreCase
-            ) + $";Database=master;";
+            var baseBuilder = new SqlConnectionStringBuilder(baseConnectionString);
 
-            ConnectionString = Regex.Replace(
-                baseConnectionString,
-                @"Database=[^;]+",
-                $"Database={dbName}",
-                RegexOptions.IgnoreCase
-            );
+            _masterConnectionString = new SqlConnectionStringBuilder(baseConnectionString)
+            {
+                InitialCatalog = "master"
+            }.ConnectionString;
 
-            using var masterConn = new SqlConnection(masterConnectionString);
-            masterConn.Open();
-            new SqlCommand($"CREATE DATABASE [{dbName}]", masterConn).ExecuteNonQuery();
+            baseBuilder.InitialCatalog = _dbName;
+            ConnectionString = baseBuilder.ConnectionString;
 
-            string script = File.ReadAllText("Scripts/Thiskord_db_tests.sql");
+            using (var masterConn = new SqlConnection(_masterConnectionString))
+            {
+                masterConn.Open();
+                using var createDbCmd = new SqlCommand($"CREATE DATABASE [{_dbName}]", masterConn);
+                createDbCmd.ExecuteNonQuery();
+            }
+
+            var scriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "Thiskord_db_tests.sql");
+            string script = File.ReadAllText(scriptPath);
 
             var statements = Regex.Split(script, @"(?<=\bEND\b)\s*\n")
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrWhiteSpace(s));
 
-            _dbConn = new SqlConnection(ConnectionString);
-            _dbConn.Open();
-
-            foreach (var statement in statements)
+            using (var dbConn = new SqlConnection(ConnectionString))
             {
-                new SqlCommand(statement, _dbConn).ExecuteNonQuery();
+                dbConn.Open();
+
+                foreach (var statement in statements)
+                {
+                    using var cmd = new SqlCommand(statement, dbConn);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
         public void Dispose()
         {
-            _dbConn?.Close();
-            _dbConn?.Dispose();
-
-            string masterConnectionString = Regex.Replace(
-                ConnectionString,
-                @"Database=[^;]+",
-                "Database=master",
-                RegexOptions.IgnoreCase
-            );
-
-            using var masterConn = new SqlConnection(masterConnectionString);
+            using var masterConn = new SqlConnection(_masterConnectionString);
             masterConn.Open();
 
-            string dbName = Regex.Match(ConnectionString, @"Database=([^;]+)", RegexOptions.IgnoreCase).Groups[1].Value;
-            new SqlCommand($"ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{dbName}]", masterConn).ExecuteNonQuery();
+            using var cmd = new SqlCommand($@"
+                IF DB_ID('{_dbName}') IS NOT NULL
+                BEGIN
+                    ALTER DATABASE [{_dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                    DROP DATABASE [{_dbName}];
+                END", masterConn);
+
+            cmd.ExecuteNonQuery();
         }
     }
 }

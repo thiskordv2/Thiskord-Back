@@ -1,4 +1,4 @@
-name: test-code.yml
+name: Testing code
 
 on:
   push:

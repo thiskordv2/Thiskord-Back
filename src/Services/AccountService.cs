@@ -28,7 +28,7 @@
 
             public UserAccount getAccount(int id)
             {
-                SqlConnection conn = _dbService.CreateConnection();
+                using var conn = _dbService.CreateConnection();
                 conn.Open();
                 string query = "SELECT user_id, user_name, user_mail, user_picture FROM Account WHERE user_id = @user_id;";
                 using var command = new SqlCommand(query, conn);
@@ -40,7 +40,7 @@
 
             public int patchAccount(UserAccount req)
             {
-                SqlConnection conn = _dbService.CreateConnection();
+                using var conn = _dbService.CreateConnection();
                 conn.Open();
                 string query = "UPDATE Account SET user_name = @user_name, " +
                                                 "user_mail = @user_mail, " +
@@ -59,7 +59,7 @@
 
             public int patchAccountPassword(UserAccount req)
             {
-                SqlConnection conn = _dbService.CreateConnection();
+                using var conn = _dbService.CreateConnection();
                 conn.Open();
                 string newCryptedPassword = BCrypt.Net.BCrypt.HashPassword(req.user_password);
                 string query = "UPDATE Account SET user_password = @user_password, modified_at = @modified_at " +
