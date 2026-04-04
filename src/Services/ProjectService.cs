@@ -7,6 +7,13 @@ using Thiskord_Back.Models.Project;
 
 namespace Thiskord_Back.Services
 {
+    public interface IProjectService
+    {
+        Project Create(string project_name, string project_desc);
+        void DeleteById(int projectId);
+        Project Update(Project updatedProject);
+        List<Project> GetAll();
+    }
     public class ProjectService
     {
         private readonly IDbConnectionService _dbService;
@@ -87,12 +94,13 @@ namespace Thiskord_Back.Services
                 {
                     connection.Open();
 
-                    string query = @"UPDATE Project SET project_name = @Name , project_desc = @Description WHERE project_id = @Id";
+                    string query = @"UPDATE Project SET project_name = @Name , project_desc = @Description, modified_at = @date WHERE project_id = @Id";
 
                     using var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Id", updatedProject.id);
                     command.Parameters.AddWithValue("@Name", updatedProject.name);
                     command.Parameters.AddWithValue("@Description", updatedProject.description);
+                    command.Parameters.AddWithValue("@date", DateTime.UtcNow);
 
                     command.ExecuteNonQuery();
                 }

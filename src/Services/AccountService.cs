@@ -52,7 +52,7 @@
                 command.Parameters.AddWithValue("@user_name", req.user_name);
                 command.Parameters.AddWithValue("@user_mail", req.user_mail);
                 command.Parameters.AddWithValue("@user_picture", req.user_picture);
-                command.Parameters.AddWithValue("@modified_at", SqlDbType.DateTime).Value = DateTime.UtcNow;
+                command.Parameters.AddWithValue("@modified_at", DateTime.UtcNow);
                 int res = command.ExecuteNonQuery();
                 return res;
             }
@@ -67,7 +67,7 @@
                 using var command = new SqlCommand(query, conn);
                 command.Parameters.AddWithValue("@user_password", newCryptedPassword);
                 command.Parameters.AddWithValue("@user_id", req.user_id);
-                command.Parameters.AddWithValue("@modified_at", SqlDbType.DateTime).Value = DateTime.UtcNow;
+                command.Parameters.AddWithValue("@modified_at", DateTime.UtcNow);
                 int res = command.ExecuteNonQuery();
                 return res;
             }

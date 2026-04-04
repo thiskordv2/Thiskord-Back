@@ -11,9 +11,9 @@ namespace Thiskord_Back.Controllers
     [Authorize]
     public class ProjectController : ControllerBase
     {
-        private ProjectService _projectService;
+        private IProjectService _projectService;
 
-        public ProjectController(ProjectService projectService)
+        public ProjectController(IProjectService projectService)
         {
             _projectService = projectService;
         }

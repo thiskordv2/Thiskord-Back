@@ -11,9 +11,9 @@ namespace Thiskord_Back.Controllers
     [Authorize]
     public class ChannelController : ControllerBase
     {
-        private ChannelService _channelService;
+        private IChannelService _channelService;
 
-        public ChannelController(ChannelService channelService)
+        public ChannelController(IChannelService channelService)
         {
             _channelService = channelService;
         }
