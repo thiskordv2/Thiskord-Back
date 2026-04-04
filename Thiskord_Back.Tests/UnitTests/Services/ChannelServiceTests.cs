@@ -67,8 +67,8 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             cmd.Parameters.AddWithValue("@id", channelId);
             using var reader = cmd.ExecuteReader();
             reader.Read().Should().BeTrue();
-            reader["name"].ToString().Should().Be(newChannelName);
-            reader["description"].ToString().Should().Be(newChannelDescription);
+            reader["channel_name"].ToString().Should().Be(newChannelName);
+            reader["channel_desc"].ToString().Should().Be(newChannelDescription);
         }
 
         [Fact]
