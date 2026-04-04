@@ -174,43 +174,36 @@ BEGIN
 INSERT INTO dbo.Account (user_name, user_mail, user_password, user_picture)
 VALUES ('EMRE', 'EMRE@EMRE.EMRE', '$2y$10$6R3FgUNLeQqltxOLo5l.g.ljOHC5Idxjhru8Eo5HDj/.aKvG9U7Ba', 'fuzbfuiebzfuizebfuizbeufbzuf');
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'rob@rob.rob')
 BEGIN
 INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('ROBIN', '$2y$10$S07.pZscIBTQ/o5xZOa0G.zoyHjxDLlfMExURmxQwCyRaw3v38j5C', 'rob@rob.rob', '010101010101010100101', '2025-12-03 11:11:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'emre@emre.emre')
 BEGIN
 INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('EMRE', '$2y$10$sXLDbdQC4jPOKZmCEJdzMeX3VNvHYG1kwg/LKpoVkKEZHq76wQ5NC', 'emre@emre.emre', '010101010101010100101', '2025-12-03 11:20:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'tim@tim.tim')
 BEGIN
 INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('TIM', '$2y$10$MGVD./ShFL1supa523qXBuU6.yDvuhxOAoCVo02nK07/BGUjMRrFW', 'tim@tim.tim', '01101010100110', '2025-12-03 11:35:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Project WHERE project_name = 'projet 1')
 BEGIN
 INSERT INTO Project (project_name, project_desc, created_at, modified_at) VALUES ('projet 1', 'projet super mega cool', '2025-12-03 11:35:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Project WHERE project_name = 'SOURCETREE')
 BEGIN
 INSERT INTO Project (project_name, project_desc, created_at, modified_at) VALUES ('SOURCETREE', 'Jpréfére google drive', '2025-12-03 11:35:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Project WHERE project_name = 'Projet test')
 BEGIN
 INSERT INTO Project (project_name, project_desc, created_at, modified_at) VALUES ('Projet test', 'Toutes facons personne ne lis jamais la notice', '2025-12-03 11:35:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.ACCESS WHERE id_account = 1 AND id_project_account = 1)
 BEGIN
@@ -248,7 +241,6 @@ IF NOT EXISTS (SELECT 1 FROM dbo.ACCESS WHERE id_account = 3 AND id_project_acco
 BEGIN
 INSERT INTO ACCESS (is_admin, is_root, id_account, id_project_account) VALUES (0, 1, 3, 3);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Channel WHERE channel_name = 'Channel 1' AND id_project = 1)
 BEGIN
@@ -274,7 +266,6 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Channel WHERE channel_name = 'Channel AAAH' AND
 BEGIN
 INSERT INTO Channel (channel_name, channel_desc, id_project, created_at, modified_at) VALUES ('Channel AAAH', 'Qui lis ?', 3, '2025-12-03 11:35:02.7233333', NULL);
 END
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.ALLOW WHERE id_user = 1 AND id_channel_user = 1)
     INSERT INTO ALLOW (id_user, id_channel_user, is_visible, is_writable) VALUES (1, 1, 1, 1);
@@ -312,7 +303,6 @@ IF NOT EXISTS (SELECT 1 FROM dbo.ALLOW WHERE id_user = 2 AND id_channel_user = 6
     INSERT INTO ALLOW (id_user, id_channel_user, is_visible, is_writable) VALUES (2, 6, 1, 1);
 IF NOT EXISTS (SELECT 1 FROM dbo.ALLOW WHERE id_user = 3 AND id_channel_user = 6)
     INSERT INTO ALLOW (id_user, id_channel_user, is_visible, is_writable) VALUES (3, 6, 1, 1);
-GO
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Message WHERE message_content = 'Un message' AND id_channel_author = 1)
     INSERT INTO Message (message_content, created_at, modified_at, id_author, id_channel_author) VALUES ('Un message', '2025-12-03 11:35:02.7233333', NULL, 1, 1);
