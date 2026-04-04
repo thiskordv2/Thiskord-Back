@@ -21,9 +21,9 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
         [Fact]
         public void ChannelController_CreateChannel_ReturnsOk()
         {
-            var request = new ChannelRequest() { name = "Test Channel", description = "This is a test channel" };
+            var request = new ChannelRequest() { name = "Test Channel", description = "This is a test channel", projectId = 1};
             var responseChannel = new Channel() { id = 1, name = request.name, description = request.description }; 
-            _mockChannelService.Setup(s => s.Create(request.name, request.description)).Returns(responseChannel);
+            _mockChannelService.Setup(s => s.Create(request.name, request.description, request.projectId)).Returns(responseChannel);
             
             var actualResult = _channelController.CreateChannel(request);
 
