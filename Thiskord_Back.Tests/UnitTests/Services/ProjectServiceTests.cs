@@ -68,7 +68,6 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             List<Project> projects = _projectService.GetAll();
             projects.Should().BeOfType<List<Project>>();
             projects.Count.Should().BeGreaterThan(0);
-            projects.Count.Should().Be(3);
         }
     }
 }

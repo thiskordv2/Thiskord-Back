@@ -63,7 +63,7 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             
             using var conn = new SqlConnection(_fixture.ConnectionString);
             conn.Open();
-            using var cmd = new SqlCommand("SELECT name, description FROM Channel WHERE channel_id = @id", conn);
+            using var cmd = new SqlCommand("SELECT channel_name, channel_desc FROM Channel WHERE channel_id = @id", conn);
             cmd.Parameters.AddWithValue("@id", channelId);
             using var reader = cmd.ExecuteReader();
             reader.Read().Should().BeTrue();

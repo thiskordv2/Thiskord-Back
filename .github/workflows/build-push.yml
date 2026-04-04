@@ -8,7 +8,7 @@ on:
   
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: thiskord-back-api
   
 jobs:
   build-and-push:
@@ -30,8 +30,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Build and Push Docker image to GitHub Container Registry
-        uses: docker/build-push-action@v4.3.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
