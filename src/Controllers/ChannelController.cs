@@ -28,7 +28,7 @@ namespace Thiskord_Back.Controllers
                 return Ok(new { resultat = "success" });
 
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
             }

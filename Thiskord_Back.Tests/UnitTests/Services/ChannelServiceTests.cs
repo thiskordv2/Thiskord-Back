@@ -29,7 +29,8 @@ namespace Thiskord_Back.Tests.UnitTests.Services
         {
             string newChannelName = "NewChannel";
             string newChannelDescription = "NewChannelDescription";
-            var res = _channelService.Create(newChannelName, newChannelDescription);
+            int projectId = 1;
+            var res = _channelService.Create(newChannelName, newChannelDescription, projectId);
             res.Should().BeOfType<Channel>();
             res.name.Should().Be(newChannelName);
             res.description.Should().Be(newChannelDescription);
@@ -54,7 +55,8 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             int channelId = 2;
             string newChannelName = "NewChannelName";
             string newChannelDescription = "NewChannelDescription";
-            var res = _channelService.Create(newChannelName, newChannelDescription);
+            int projectId = 1;
+            var res = _channelService.Create(newChannelName, newChannelDescription, projectId);
             res.Should().BeOfType<Channel>();
             res.name.Should().Be(newChannelName);
             res.description.Should().Be(newChannelDescription);

@@ -9,7 +9,7 @@ namespace Thiskord_Back.Services
 {
     public interface IChannelService
     {
-        Channel Create(string channel_name, string channel_desc);
+        Channel Create(string channel_name, string channel_desc, int projectId);
         void DeleteById(int channelId);
         Channel Update(int channel_id, string channel_name, string channel_desc);
         List<Channel> GetChannelsByProjectId(int projectId);
