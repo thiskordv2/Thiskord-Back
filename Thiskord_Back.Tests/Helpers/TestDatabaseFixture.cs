@@ -3,57 +3,68 @@ using Microsoft.Data.SqlClient;
 
 namespace Thiskord_Back.Tests.Helpers
 {
-    // TestDatabaseFixture.cs
     public class TestDatabaseFixture : IDisposable
     {
         public string ConnectionString { get; }
         private readonly SqlConnection _dbConn;
-        
+
         public TestDatabaseFixture()
         {
             string dbName = $"Thiskord_Test_{Guid.NewGuid():N}";
-            ConnectionString = $"Server=(localdb)\\mssqllocaldb;Database={dbName};Integrated Security=true;";
 
-            using var masterConn = new SqlConnection("Server=(localdb)\\mssqllocaldb;Integrated Security=true;");
+            string baseConnectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                ?? "Server=localhost,1433;User Id=sa;Password=YourLocalPassword;TrustServerCertificate=True;";
+
+            var masterConnectionString = Regex.Replace(
+                baseConnectionString,
+                @"Database=[^;]+;?",
+                "",
+                RegexOptions.IgnoreCase
+            ) + $";Database=master;";
+
+            ConnectionString = Regex.Replace(
+                baseConnectionString,
+                @"Database=[^;]+",
+                $"Database={dbName}",
+                RegexOptions.IgnoreCase
+            );
+
+            using var masterConn = new SqlConnection(masterConnectionString);
             masterConn.Open();
             new SqlCommand($"CREATE DATABASE [{dbName}]", masterConn).ExecuteNonQuery();
 
             string script = File.ReadAllText("Scripts/Thiskord_db_tests.sql");
 
-            // Split sur END suivi d'un saut de ligne (fin de bloc IF/BEGIN/END)
             var statements = Regex.Split(script, @"(?<=\bEND\b)\s*\n")
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrWhiteSpace(s));
 
-            var dbConn = new SqlConnection(ConnectionString);
-            dbConn.Open();
+            _dbConn = new SqlConnection(ConnectionString);
+            _dbConn.Open();
 
             foreach (var statement in statements)
             {
-                try
-                {
-                    new SqlCommand(statement, dbConn).ExecuteNonQuery();
-                }
-                catch (SqlException ex)
-                {
-                    Console.WriteLine($"SQL Warning: {ex.Message}");
-                }
+                new SqlCommand(statement, _dbConn).ExecuteNonQuery();
             }
-            _dbConn = dbConn;
         }
-        
+
         public void Dispose()
         {
             _dbConn?.Close();
             _dbConn?.Dispose();
 
-            SqlConnection.ClearAllPools();
+            string masterConnectionString = Regex.Replace(
+                ConnectionString,
+                @"Database=[^;]+",
+                "Database=master",
+                RegexOptions.IgnoreCase
+            );
 
-            using var conn = new SqlConnection("Server=(localdb)\\mssqllocaldb;Integrated Security=true;");
-            conn.Open();
-            string dbName = new SqlConnectionStringBuilder(ConnectionString).InitialCatalog;
-            new SqlCommand($"ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{dbName}]", conn).ExecuteNonQuery();
+            using var masterConn = new SqlConnection(masterConnectionString);
+            masterConn.Open();
+
+            string dbName = Regex.Match(ConnectionString, @"Database=([^;]+)", RegexOptions.IgnoreCase).Groups[1].Value;
+            new SqlCommand($"ALTER DATABASE [{dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{dbName}]", masterConn).ExecuteNonQuery();
         }
     }
 }
-
