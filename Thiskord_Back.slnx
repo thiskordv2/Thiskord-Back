@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="Thiskord_Back.csproj" />
+  <Project Path="src/Thiskord_Back.csproj" />
+  <Project Path="Thiskord_Back.Tests/Thiskord_Back.Tests.csproj" />
 </Solution>

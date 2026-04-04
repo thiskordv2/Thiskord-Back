@@ -1,0 +1,58 @@
+services:
+  backend:
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    working_dir: /App
+    volumes:
+      - ./:/App
+      - /App/obj/
+      - /App/bin/
+    ports:
+      - "8080:8080"
+    command: dotnet watch run --urls=http://+:8080
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=database;Database=thiskord;User Id=sa;Password=${{ secrets.DB_PASSWORD }};TrustServerCertificate=True;
+    depends_on:
+      database.configurator:
+        condition: service_completed_successfully
+    networks:
+      - backend_network
+
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${{ secrets.DB_PASSWORD }}
+    volumes:
+      - database_data:/var/opt/mssql
+    ports:
+      - "1533:1433"
+    networks:
+      - backend_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${{ secrets.DB_PASSWORD }}' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+      timeout: 3s
+
+
+  database.configurator:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./Thiskord_db.sql:/init.sql
+    networks:
+      - backend_network
+    command: >
+      bash -c "
+      /opt/mssql-tools18/bin/sqlcmd -S database -U sa -P ${{ secrets.DB_PASSWORD }} -C -i /init.sql
+      "
+volumes:
+  database_data:
+
+networks:
+  backend_network:
+    driver: bridge
