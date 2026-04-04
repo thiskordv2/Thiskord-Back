@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Moq;
 using Thiskord_Back.Models.Project;
 using Thiskord_Back.Services;
-using Thiskord_Back.Tests.Setup;
+using Thiskord_Back.Tests.Helpers;
 
 namespace Thiskord_Back.Tests.UnitTests.Services
 {

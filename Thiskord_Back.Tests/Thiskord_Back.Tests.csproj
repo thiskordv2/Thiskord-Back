@@ -31,10 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
     <Folder Include="IntegrationTests\Api\" />
     <Folder Include="IntegrationTests\Database\" />
-    <Folder Include="IntegrationTests\SignalR\" />
     <Folder Include="SecurityTests\" />
   </ItemGroup>
 

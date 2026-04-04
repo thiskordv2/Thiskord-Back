@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Thiskord_Back.Models.Auth;
 using Thiskord_Back.Services;
-using Thiskord_Back.Tests.Setup;
+using Thiskord_Back.Tests.Helpers;
 
 namespace Thiskord_Back.Tests.UnitTests.Services
 {

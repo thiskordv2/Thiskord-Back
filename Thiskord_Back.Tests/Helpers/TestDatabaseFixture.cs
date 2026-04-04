@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 
-namespace Thiskord_Back.Tests.Setup
+namespace Thiskord_Back.Tests.Helpers
 {
     // TestDatabaseFixture.cs
     public class TestDatabaseFixture : IDisposable
