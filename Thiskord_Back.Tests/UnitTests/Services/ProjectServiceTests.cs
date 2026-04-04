@@ -63,7 +63,7 @@ namespace Thiskord_Back.Tests.UnitTests.Services
         }
         
         [Fact]
-        public void ChannelService_GetChannelsByProjectId_ReturnsListChannels()
+        public void ProjectService_GetAll_ReturnsAllProjects()
         {
             List<Project> projects = _projectService.GetAll();
             projects.Should().BeOfType<List<Project>>();

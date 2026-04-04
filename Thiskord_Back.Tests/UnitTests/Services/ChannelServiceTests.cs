@@ -56,10 +56,19 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             string newChannelName = "NewChannelName";
             string newChannelDescription = "NewChannelDescription";
             int projectId = 1;
-            var res = _channelService.Create(newChannelName, newChannelDescription, projectId);
+            var res = _channelService.Update(projectId, newChannelName, newChannelDescription);
             res.Should().BeOfType<Channel>();
             res.name.Should().Be(newChannelName);
             res.description.Should().Be(newChannelDescription);
+            
+            using var conn = new SqlConnection(_fixture.ConnectionString);
+            conn.Open();
+            using var cmd = new SqlCommand("SELECT name, description FROM Channel WHERE channel_id = @id", conn);
+            cmd.Parameters.AddWithValue("@id", channelId);
+            using var reader = cmd.ExecuteReader();
+            reader.Read().Should().BeTrue();
+            reader["name"].ToString().Should().Be(newChannelName);
+            reader["description"].ToString().Should().Be(newChannelDescription);
         }
 
         [Fact]
