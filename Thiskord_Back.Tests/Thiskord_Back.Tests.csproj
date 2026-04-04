@@ -36,8 +36,12 @@
     <Folder Include="IntegrationTests\Database\" />
     <Folder Include="IntegrationTests\SignalR\" />
     <Folder Include="SecurityTests\" />
-    <Folder Include="UnitTests\Controllers\" />
-    <Folder Include="UnitTests\Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Scripts\Thiskord_db_tests.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

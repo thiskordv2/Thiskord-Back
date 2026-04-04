@@ -10,7 +10,6 @@ namespace Thiskord_Back.Services
     public class ChannelService
     {
         private readonly IDbConnectionService _dbService;
-
         private readonly LogService logService;
 
         public ChannelService(IDbConnectionService dbService, LogService logService)
