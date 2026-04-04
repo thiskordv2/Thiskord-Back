@@ -1,6 +1,5 @@
 using Microsoft.Data.SqlClient;
 using Thiskord_Back.Models.Account;
-using Thiskord_Back.Models.Project;
 
 namespace Thiskord_Back.Services
 {

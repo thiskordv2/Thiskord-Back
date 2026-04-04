@@ -7,10 +7,17 @@ using Thiskord_Back.Models.Channel;
 
 namespace Thiskord_Back.Services
 {
+    public interface IChannelService
+    {
+        Channel Create(string channel_name, string channel_desc);
+        void DeleteById(int channelId);
+        Channel Update(int channel_id, string channel_name, string channel_desc);
+        List<Channel> GetChannelsByProjectId(int projectId);
+    }
+    
     public class ChannelService
     {
         private readonly IDbConnectionService _dbService;
-
         private readonly LogService logService;
 
         public ChannelService(IDbConnectionService dbService, LogService logService)
@@ -96,12 +103,13 @@ namespace Thiskord_Back.Services
                 {
                     connection.Open();
 
-                    string query = @"UPDATE Channel SET channel_name = @Name , channel_desc = @Description WHERE channel_id = @Id";
+                    string query = @"UPDATE Channel SET channel_name = @Name , channel_desc = @Description, modified_at = @date WHERE channel_id = @Id";
 
                     using var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Id", channel_id);
                     command.Parameters.AddWithValue("@Name", channel_name);
                     command.Parameters.AddWithValue("@Description", channel_desc);
+                    command.Parameters.AddWithValue("@date", DateTime.UtcNow);
 
                     command.ExecuteNonQuery();
                     channel.id = channel_id;

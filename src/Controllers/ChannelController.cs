@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Thiskord_Back.Models.Project;
+using Thiskord_Back.Models.Channel;
 using Thiskord_Back.Services;
 
 namespace Thiskord_Back.Controllers
@@ -9,21 +9,22 @@ namespace Thiskord_Back.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class ProjectController : ControllerBase
+    public class ChannelController : ControllerBase
     {
-        private ProjectService _projectService;
+        private IChannelService _channelService;
 
-        public ProjectController(ProjectService projectService)
+        public ChannelController(IChannelService channelService)
         {
-            _projectService = projectService;
+            _channelService = channelService;
         }
 
         [HttpPost("create")]
-        public IActionResult CreateProject([FromBody] ProjectRequest req)
+        
+        public IActionResult CreateChannel([FromBody] ChannelRequest req)
         {
             try
             {
-                _projectService.Create(req.name, req.description);
+                _channelService.Create(req.name, req.description, req.projectId);
                 return Ok(new { resultat = "success" });
 
             }
@@ -33,11 +34,11 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteProject(int id)
+        public IActionResult DeleteChannel(int id)
         {
             try
             {
-                _projectService.DeleteById(id);
+                _channelService.DeleteById(id);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)
@@ -46,11 +47,11 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpPut("{id:int}")]
-        public IActionResult UpdateProject([FromBody] ProjectRequest req, int id)
+        public IActionResult UpdateChannel([FromBody] ChannelRequest req, int id)
         {
             try
             {
-                _projectService.Update(id, req.name, req.description);
+                _channelService.Update(id, req.name, req.description);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)
@@ -58,14 +59,13 @@ namespace Thiskord_Back.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
             }
         }
-        
-        [HttpGet("all")]
-        public IActionResult GetAllProjects()
+        [HttpGet("project/{projectId:int}")]
+        public IActionResult GetChannelsByProjectId(int projectId)
         {
             try
             {
-                var projects = _projectService.GetAll();
-                return Ok(projects);
+                var channels = _channelService.GetChannelsByProjectId(projectId);
+                return Ok(channels);
             }
             catch (Exception ex)
             {

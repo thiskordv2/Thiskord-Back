@@ -408,7 +408,7 @@ docker compose up
 Reinitialiser completement la stack (dont volume SQL):
 
 ```powershell
-docker compose down -v
+docker compose down -v // Pour supprimer les volumes (BDD)
 docker compose up
 ```
 

@@ -1,6 +1,6 @@
 services:
   backend:
-    image: mcr.microsoft.com/dotnet/sdk:9.0
+    image: ghcr.io/rbfrg/thiskord-back:latest
     working_dir: /App
     volumes:
       - ./:/App

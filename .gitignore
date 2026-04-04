@@ -15,3 +15,5 @@ logs.txt
 
 .idea/
 **.idea/
+.env
+**.env

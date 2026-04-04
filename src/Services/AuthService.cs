@@ -12,29 +12,35 @@ using Microsoft.Extensions.Configuration;
 
 namespace Thiskord_Back.Services
 {
-    public class AuthService
+    public interface IAuthService
+    {
+        AuthenticatedUser AuthLogin(string user_auth, string user_password);
+    }
+    public class AuthService : IAuthService
     {
         private readonly IDbConnectionService _dbService;
         private readonly IConfiguration _configuration;
-
+        
+        
         public AuthService(IDbConnectionService dbService, IConfiguration configuration)
         {
             _dbService = dbService;
             _configuration = configuration;
         }
-        public AuthenticatedUser AuthLogin(string user_auth, string user_password)
+        public virtual AuthenticatedUser AuthLogin(string user_auth, string user_password)
         {
             // requete en base pour chopper les infos utilisateurs : user_auth
-            SqlConnection conn = _dbService.CreateConnection();
-            conn.Open();
             string pwd = "";
             string query = "SELECT user_password FROM dbo.Account WHERE user_name = @user_auth";
-            using var command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("@user_auth", user_auth);
-            using var res = command.ExecuteReader();
-            res.Read();
-            pwd = res.GetString(0);
-            res.Close();
+            using (var conn = _dbService.CreateConnection())
+            {
+                conn.Open();
+                using var command = new SqlCommand(query, conn);
+                command.Parameters.AddWithValue("@user_auth", user_auth);
+                using var res = command.ExecuteReader();
+                res.Read();
+                pwd = res.GetString(0);
+            }
             // à partir du résultat, on compare le password en base avec : user_encrypted password
             bool ok = BCrypt.Net.BCrypt.Verify(user_password, pwd);
             // si true : 
@@ -43,8 +49,10 @@ namespace Thiskord_Back.Services
                 // requete pour aller chercher les infos utilisateur
                 int user_id;
                 query = "SELECT user_id, user_name, user_mail, user_picture FROM Account WHERE user_name = @user_auth;";
-                using var command1 = new SqlCommand(query, conn);
+                using var conn2 = _dbService.CreateConnection();
+                using var command1 = new SqlCommand(query, conn2);
                 command1.Parameters.AddWithValue("@user_auth", user_auth);
+                conn2.Open();
                 using var res1 = command1.ExecuteReader();
                 res1.Read();
                 user_id = res1.GetInt32(0);

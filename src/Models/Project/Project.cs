@@ -12,6 +12,9 @@ namespace Thiskord_Back.Models.Project
     }
     public class ProjectRequest
     {
+        [JsonPropertyName("id")]
+        public int id { get; set; }
+        
         [JsonPropertyName("name")]
         public string name { get; set; }
             

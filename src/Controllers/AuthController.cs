@@ -11,9 +11,9 @@ namespace Thiskord_Back.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public AuthController(AuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
@@ -22,6 +22,7 @@ namespace Thiskord_Back.Controllers
         public IActionResult authentification([FromBody] AuthRequest req)
         {
             AuthenticatedUser res = _authService.AuthLogin(req.user_auth, req.password);
+            if (res == null) return Unauthorized("Identifiants invalides");
             return Ok(res);
         }
     }
