@@ -13,27 +13,27 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.5
-        with:
-          host: ${{ secrets.HOST }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.PORT || 22 }}
-          envs: DB_PASSWORD,REGISTRY,IMAGE_NAME,GITHUB_TOKEN,GITHUB_ACTOR
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           REGISTRY: ghcr.io
           IMAGE_NAME: thiskordv2/thiskord-back-api
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
-        script: |
-          cd /opt/Thiskord-Back
-          
-          git pull origin main
-          
-          echo $GITHUB_TOKEN | docker login $REGISTRY -u $GITHUB_ACTOR --password-stdin
-          
-          docker pull $REGISTRY/$IMAGE_NAME:latest
-          
-          docker compose up -d --force-recreate
-          
-          docker image prune -f
+        with:
+          host: ${{ secrets.HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT || 22 }}
+          envs: DB_PASSWORD,REGISTRY,IMAGE_NAME,GITHUB_TOKEN,GITHUB_ACTOR
+          script: |
+            cd /opt/Thiskord-Back
+            
+            git pull origin main
+            
+            echo $GITHUB_TOKEN | docker login $REGISTRY -u $GITHUB_ACTOR --password-stdin
+            
+            docker pull $REGISTRY/$IMAGE_NAME:latest
+            
+            docker compose up -d --force-recreate
+            
+            docker image prune -f
