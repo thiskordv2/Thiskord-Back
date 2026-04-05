@@ -1,0 +1,3 @@
+api.emre-ak.fr {
+    reverse_proxy backend:8080
+}
