@@ -14,7 +14,7 @@ namespace Thiskord_Back.Services
         Project Update(Project updatedProject);
         List<Project> GetAll();
     }
-    public class ProjectService
+    public class ProjectService : IProjectService
     {
         private readonly IDbConnectionService _dbService;
 

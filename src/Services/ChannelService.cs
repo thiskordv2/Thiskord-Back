@@ -15,7 +15,7 @@ namespace Thiskord_Back.Services
         List<Channel> GetChannelsByProjectId(int projectId);
     }
     
-    public class ChannelService
+    public class ChannelService : IChannelService
     {
         private readonly IDbConnectionService _dbService;
         private readonly LogService logService;
