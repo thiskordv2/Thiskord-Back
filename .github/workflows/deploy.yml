@@ -28,14 +28,12 @@ jobs:
           script: |
             cd /opt/Thiskord-Back
             
-            docker compose down
-
-            git pull origin main 
-
+            git pull origin main
+            
             echo $GITHUB_TOKEN | docker login $REGISTRY -u $GITHUB_ACTOR --password-stdin
             
             docker pull $REGISTRY/$IMAGE_NAME:latest
             
-            docker compose -f compose.prod.yaml up -d
+            docker compose up -d --force-recreate
             
             docker image prune -f
