@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Thiskord_Back.Hubs;
 using Thiskord_Back.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +18,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IDbConnectionService, DBService>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<JsonService>();
 builder.Services.AddScoped<LogService>();
-builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<InscriptionService>();
@@ -54,7 +55,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddScoped<ChannelService>();
+builder.Services.AddScoped<IChannelService, ChannelService>();
 
 var app = builder.Build();
 
@@ -63,12 +64,19 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseHttpsRedirection();
 }
 
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 app.UseAuthentication();
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
