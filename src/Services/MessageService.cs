@@ -6,8 +6,8 @@ namespace Thiskord_Back.Services
     
     public interface IMessageService
     {
-        Task<List<Message>> GetAllMessage(int channelId);
-        Task<Message> SendMessage(int channelId, int userId, string message);
+        Task<List<MessageDTO>> GetAllMessage(int channelId);
+        Task<MessageDTO> SendMessage(int channelId, int userId, string message, string username);
         Task DeleteMessage(int messageId, int channelId);
     }
     
@@ -22,7 +22,7 @@ namespace Thiskord_Back.Services
             this.logService = logService;
         }
 
-        public async Task<Message> SendMessage(int channelId, int userId, string message)
+        public async Task<MessageDTO> SendMessage(int channelId, int userId, string message, string username)
         {
             try
             {
@@ -39,24 +39,23 @@ namespace Thiskord_Back.Services
                 cmd.Parameters.AddWithValue("@userId", userId);
                 cmd.Parameters.AddWithValue("@text", message);
                 var id = (int)await cmd.ExecuteScalarAsync();
-                Console.Write($"Message inserted with ID: {id}");
 
-                var newMessage = new Message(
-                    username: $"user#{userId}",
+                var newMessage = new MessageDTO(
+                    username: username,
                     idMessage: id,
                     content: message,
-                    createdAt: DateTime.UtcNow
+                    createdAt: DateTime.UtcNow.ToString("dd/MM HH:mm")
                 );
                 return newMessage;
             }
             catch (Exception e)
             {
-                logService.AddLog(1,$"Error in SendMessage: {e.Message}");
+                logService.CreateLog($"Error in SendMessage: {e.Message}");
                 throw;
             }
         }
 
-        public async Task<List<Message>> GetAllMessage(int channelId)
+        public async Task<List<MessageDTO>> GetAllMessage(int channelId)
         {
             try
             {
@@ -78,7 +77,7 @@ namespace Thiskord_Back.Services
                 cmd.Parameters.AddWithValue("@channelId", channelId);
 
                 using var reader = await cmd.ExecuteReaderAsync();
-                var history = new List<Message>();
+                var history = new List<MessageDTO>();
                 while (await reader.ReadAsync())
                 {
                     var id = reader.GetInt32(0);
@@ -91,13 +90,12 @@ namespace Thiskord_Back.Services
                         DateTime.SpecifyKind(createdAt, DateTimeKind.Utc),
                         parisTz
                     );
-
-                    history.Add(new Message(username, id, text, parisTime)
+                    history.Add(new MessageDTO(username, id, text, parisTime.ToString("dd/MM HH:mm"))
                     {
                         Username = username,
                         Id = id,
                         Content = text,
-                        CreatedAt = parisTime,
+                        CreatedAt = parisTime.ToString("dd/MM HH:mm")
                     });
                 }
 

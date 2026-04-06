@@ -53,9 +53,9 @@ namespace Thiskord_Back.Tests.IntegrationTests.Database
             int userId = 1;
             string content = "Message de test performance";
             var sw = new Stopwatch();
-
+            string username = "TestUser";
             sw.Start();
-            var result = await _messageService.SendMessage(channelId, userId, content);
+            var result = await _messageService.SendMessage(channelId, userId, content, username);
             sw.Stop();
 
             sw.ElapsedMilliseconds.Should().BeLessThan(100, 
@@ -68,7 +68,7 @@ namespace Thiskord_Back.Tests.IntegrationTests.Database
         [Fact]
         public async Task DeleteMessage_ShouldRemoveFromDatabase()
         {
-            var msg = await _messageService.SendMessage(1, 1, "A supprimer");
+            var msg = await _messageService.SendMessage(1, 1, "A supprimer", "TestUser");
 
             await _messageService.DeleteMessage(msg.Id, 1);
 

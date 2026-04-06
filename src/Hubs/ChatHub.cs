@@ -33,11 +33,11 @@ namespace Thiskord_Back.Hubs
             var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdClaim, out var userId))
                 throw new HubException("Utilisateur non authentifie");
-            
-            var response = await _messageService.SendMessage(channelId, userId, text);
-            
+            var username = Context.User?.Identity?.Name ?? $"user#{userId}";
+
+            var response = await _messageService.SendMessage(channelId, userId, text, username);
             await Clients.Group(channelId.ToString())
-                .SendAsync("ReceiveMessage", response.Id, response.Username, response.Content, response.CreatedAt.ToString("dd/MM HH:mm"));
+                .SendAsync("ReceiveMessage", response.Id, response.Username, response.Content, response.CreatedAt);
         }
 
         public async Task DeleteMessage(int channelId, int messageId)
