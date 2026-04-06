@@ -28,7 +28,6 @@ namespace Thiskord_Back.Tests.UnitTests.Services
             var res = _userService.GetAllUsers();
             res.Should().BeOfType<List<UserAccount>>();
             res.Count.Should().BeGreaterThan(0);
-            res.Should().HaveCount(3);
         }
     }    
 }

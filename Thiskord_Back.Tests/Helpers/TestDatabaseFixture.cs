@@ -15,7 +15,7 @@ namespace Thiskord_Back.Tests.Helpers
 
             var baseConnectionString =
                 Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-                ?? "Server=localhost,1433;User Id=sa;Password=YourLocalPassword;TrustServerCertificate=True;Encrypt=False;";
+                ?? "Server=localhost,1433;User Id=sa;Password=MonSuperMotDePasse123;TrustServerCertificate=True;Encrypt=False;";
 
             var baseBuilder = new SqlConnectionStringBuilder(baseConnectionString);
 
@@ -37,7 +37,8 @@ namespace Thiskord_Back.Tests.Helpers
             var scriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "Thiskord_db_tests.sql");
             string script = File.ReadAllText(scriptPath);
 
-            var statements = Regex.Split(script, @"(?<=\bEND\b)\s*\n")
+            var statements = script
+                .Split(new[] { "\nGO", "\r\nGO" }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrWhiteSpace(s));
 

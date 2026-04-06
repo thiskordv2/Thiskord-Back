@@ -180,9 +180,9 @@ BEGIN
 INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('ROBIN', '$2y$10$S07.pZscIBTQ/o5xZOa0G.zoyHjxDLlfMExURmxQwCyRaw3v38j5C', 'rob@rob.rob', '010101010101010100101', '2025-12-03 11:11:02.7233333', NULL);
 END
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'emre@emre.emre')
+IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'emre@test.test')
 BEGIN
-INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('EMRE', '$2y$10$sXLDbdQC4jPOKZmCEJdzMeX3VNvHYG1kwg/LKpoVkKEZHq76wQ5NC', 'emre@emre.emre', '010101010101010100101', '2025-12-03 11:20:02.7233333', NULL);
+INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('TestEmre', '$2y$10$sXLDbdQC4jPOKZmCEJdzMeX3VNvHYG1kwg/LKpoVkKEZHq76wQ5NC', 'emre@test.test', '010101010101010100101', '2025-12-03 11:20:02.7233333', NULL);
 END
 
 IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'tim@tim.tim')
@@ -328,3 +328,27 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Message WHERE message_content = 'Un message' AN
     INSERT INTO Message (message_content, created_at, modified_at, id_author, id_channel_author) VALUES ('Un message', '2025-12-03 11:35:02.7233333', NULL, 1, 6);
 IF NOT EXISTS (SELECT 1 FROM dbo.Message WHERE message_content = 'Une réponse' AND id_channel_author = 6)
     INSERT INTO Message (message_content, created_at, modified_at, id_author, id_channel_author) VALUES ('Une réponse', '2025-12-03 11:40:02.7233333', NULL, 2, 6);
+
+DECLARE @p1_id INT = (SELECT project_id FROM dbo.Project WHERE project_name = 'projet 1');
+DECLARE @ch1_p1 INT = (SELECT channel_id FROM dbo.Channel WHERE channel_name = 'Channel 1' AND id_project = @p1_id);
+DECLARE @i INT = 1;
+DECLARE @emre_id INT = (SELECT user_id FROM dbo.Account WHERE user_mail = 'emre@emre.emre');
+
+WHILE @i <= 200
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM dbo.Message
+        WHERE  message_content    = CONCAT('Message de test automatique n°', @i)
+          AND  id_channel_author  = @ch1_p1
+    )
+BEGIN
+INSERT INTO dbo.Message (message_content, id_author, id_channel_author, created_at)
+VALUES (
+           CONCAT('Message de test automatique n°', @i),
+           @emre_id,
+           @ch1_p1,
+           DATEADD(SECOND, @i, '2025-12-03 11:35:00')
+       );
+END
+    SET @i = @i + 1;
+END

@@ -12,9 +12,9 @@ namespace Thiskord_Back.Controllers
 
         private readonly IDbConnectionService _dbService;
 
-        private readonly LogService _logService;
+        private readonly ILogService _logService;
 
-        public TestController(IDbConnectionService dbService, LogService logService)
+        public TestController(IDbConnectionService dbService, ILogService logService)
         {
             _dbService = dbService;
             _logService = logService;

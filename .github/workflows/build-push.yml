@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [ "Testing code" ]
     types: [ completed ]
-    branches: [ main, develop ]
+    branches: [ main ]
   
 env:
   REGISTRY: ghcr.io

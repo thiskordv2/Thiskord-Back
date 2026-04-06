@@ -18,9 +18,9 @@ namespace Thiskord_Back.Services
     {
         private readonly IDbConnectionService _dbService;
 
-        private readonly LogService logService;
+        private readonly ILogService logService;
 
-        public ProjectService(IDbConnectionService dbService, LogService logService)
+        public ProjectService(IDbConnectionService dbService, ILogService logService)
         {
             this._dbService = dbService;
             this.logService = logService;
