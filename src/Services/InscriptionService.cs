@@ -7,9 +7,9 @@ namespace Thiskord_Back.Services
     public class InscriptionService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly LogService _logService;
+        private readonly ILogService _logService;
 
-        public InscriptionService(IDbConnectionService dbService, LogService logService)
+        public InscriptionService(IDbConnectionService dbService, ILogService logService)
         {
             _dbService = dbService;
             _logService = logService;

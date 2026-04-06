@@ -6,9 +6,9 @@ namespace Thiskord_Back.Services
     public class UserService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly LogService logService;
+        private readonly ILogService logService;
         
-        public UserService(IDbConnectionService dbService, LogService logService)
+        public UserService(IDbConnectionService dbService, ILogService logService)
         {
             this._dbService = dbService;
             this.logService = logService;

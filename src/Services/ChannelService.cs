@@ -18,9 +18,9 @@ namespace Thiskord_Back.Services
     public class ChannelService : IChannelService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly LogService logService;
+        private readonly ILogService logService;
 
-        public ChannelService(IDbConnectionService dbService, LogService logService)
+        public ChannelService(IDbConnectionService dbService, ILogService logService)
         {
             this._dbService = dbService;
             this.logService = logService;

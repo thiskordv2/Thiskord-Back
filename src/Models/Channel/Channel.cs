@@ -7,6 +7,8 @@ namespace Thiskord_Back.Models.Channel
         public int? id { get; set; }
         public string? name { get; set; }
         public string? description { get; set; }
+        
+        public Channel() {}
     }
 
     public class ChannelRequest
