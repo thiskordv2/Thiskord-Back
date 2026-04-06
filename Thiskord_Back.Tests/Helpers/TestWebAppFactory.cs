@@ -40,6 +40,10 @@ namespace Thiskord_Back.Tests.Helpers
                     .Returns(() => new Microsoft.Data.SqlClient.SqlConnection(ConnectionString));
 
                 services.AddSingleton<IDbConnectionService>(MockDbService.Object);
+                services.AddSignalR(options =>
+                {
+                    options.EnableDetailedErrors = true;
+                });
             });
             
             builder.UseSetting("ASPNETCORE_URLS", "http://+");
