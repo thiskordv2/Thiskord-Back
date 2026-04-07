@@ -134,6 +134,24 @@ CREATE TABLE dbo.Task
 END
 GO
 
+-- Table Invitation_Token
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Invitation_Token' AND schema_id = SCHEMA_ID('dbo'))
+BEGIN
+CREATE TABLE dbo.Invitation_Token
+(
+    it_id INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    it_token VARCHAR(MAX),
+    it_creator_id INT NULL,
+    it_project_id INT NULL,
+    created_at DATETIME2 DEFAULT GETDATE(),
+    expires_at DATETIME2,
+    
+    CONSTRAINT fk_it_creator_id FOREIGN KEY (it_creator_id) REFERENCES dbo.Account(user_id) ON DELETE SET NULL,
+    CONSTRAINT fk_it_project_id FOREIGN KEY (it_project_id) REFERENCES dbo.Project(project_id) ON DELETE SET NULL
+);
+END
+GO
+
 -- Table INCLUDE (table intermédiaire Task <-> Sprint)
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'INCLUDE' AND schema_id = SCHEMA_ID('dbo'))
 BEGIN
