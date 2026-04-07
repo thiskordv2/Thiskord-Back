@@ -23,7 +23,7 @@ builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IInviteService, InviteService>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<InscriptionService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
