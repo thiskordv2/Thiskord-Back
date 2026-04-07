@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Thiskord_Back.Models.Project;
@@ -65,18 +66,19 @@ namespace Thiskord_Back.Controllers
             }
         }
         
-        [HttpGet("all")]
-        public IActionResult GetAllProjects()
-        {
-            try
+            [HttpGet("all")]
+            public async Task<IActionResult> GetAllProjects()
             {
-                var projects = _projectService.GetAll();
-                return Ok(projects);
+                try
+                {
+                    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                    var projects = await _projectService.GetAllProjectsForUser(userId);
+                    return Ok(projects);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
-            }
-        }
     }
 }

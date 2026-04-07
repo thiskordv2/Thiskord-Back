@@ -50,7 +50,7 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
         }
 
         [Fact]
-        public void projectController_GetAllProjects_ReturnsOk()
+        public async Task projectController_GetAllProjects_ReturnsOk()
         {
             List<Project> projects = new List<Project>
             {
@@ -59,7 +59,7 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
             };
             _mockProjectService.Setup(s => s.GetAll()).Returns(projects);
             
-            var actionResult = _projectController.GetAllProjects();
+            var actionResult = await _projectController.GetAllProjects();
             actionResult.Should().BeOfType<OkObjectResult>();
             
             var okResult = actionResult as OkObjectResult;

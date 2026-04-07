@@ -242,9 +242,9 @@ BEGIN
 END
 GO
 
-IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'emre@emre.emre')
+IF NOT EXISTS (SELECT 1 FROM dbo.Account WHERE user_mail = 'emre@test.tt')
 BEGIN
-    INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('EMRE', '$2y$10$sXLDbdQC4jPOKZmCEJdzMeX3VNvHYG1kwg/LKpoVkKEZHq76wQ5NC', 'emre@emre.emre', '010101010101010100101', '2025-12-03 11:20:02.7233333', NULL);
+    INSERT INTO Account (user_name, user_password, user_mail, user_picture, created_at, modified_at) VALUES ('EMRE', '$2y$10$S07.pZscIBTQ/o5xZOa0G.zoyHjxDLlfMExURmxQwCyRaw3v38j5C', 'emre@test.tt', '010101010101010100101', '2025-12-03 11:20:02.7233333', NULL);
 END
 GO
 
@@ -270,6 +270,12 @@ GO
 IF NOT EXISTS (SELECT 1 FROM dbo.Project WHERE project_name = 'Projet test')
 BEGIN
     INSERT INTO Project (project_name, project_desc, created_at, modified_at) VALUES ('Projet test', 'Toutes facons personne ne lis jamais la notice', '2025-12-03 11:35:02.7233333', NULL);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM dbo.Project WHERE project_name = 'Nouveau projet')
+BEGIN
+INSERT INTO Project (project_name, project_desc, created_at, modified_at) VALUES ('Nouveau projet', 'Toutes facons personne ne lis jamais la notice', '2025-12-03 11:35:02.7233333', NULL);
 END
 GO
 
@@ -309,6 +315,10 @@ END
 IF NOT EXISTS (SELECT 1 FROM dbo.ACCESS WHERE id_account = 3 AND id_project_account = 3)
 BEGIN
     INSERT INTO ACCESS (is_admin, is_root, id_account, id_project_account) VALUES (0, 1, 3, 3);
+END
+IF NOT EXISTS (SELECT 1 FROM dbo.ACCESS WHERE id_account = 1 AND id_project_account = 4)
+BEGIN
+INSERT INTO ACCESS (is_admin, is_root, id_account, id_project_account) VALUES (0, 1, 1, 4);
 END
 GO
 

@@ -19,7 +19,6 @@ builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IDbConnectionService, DBService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<JsonService>();
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IMessageService, MessageService>();

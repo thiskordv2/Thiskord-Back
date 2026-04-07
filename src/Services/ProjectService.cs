@@ -13,6 +13,7 @@ namespace Thiskord_Back.Services
         void DeleteById(int projectId);
         Project Update(Project updatedProject);
         List<Project> GetAll();
+        Task<List<Project>> GetAllProjectsForUser(int userId);
     }
     public class ProjectService : IProjectService
     {
@@ -140,6 +141,44 @@ namespace Thiskord_Back.Services
                             description = reader.IsDBNull(2) ? null : reader.GetString(2)
                         };
 
+                        projects.Add(project);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog($"Erreur lors de la récupération des projets : {ex.Message}");
+            }
+            return projects;
+        }
+
+        public async Task<List<Project>> GetAllProjectsForUser(int userId)
+        {
+            var projects =  new List<Project>();
+
+            try
+            { 
+                using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+
+                    const string query = @"
+                    SELECT p.project_id, p.project_name, p.project_desc
+                    FROM Project p
+                    INNER JOIN ACCESS a ON a.id_project_account = p.project_id
+                    WHERE a.id_account = @UserId";
+                    
+                    await using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    await using var reader = await command.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        var project = new Project
+                        {
+                            id = reader.IsDBNull(0) ? null : reader.GetInt32(0),
+                            name = reader.IsDBNull(1) ? null : reader.GetString(1),
+                            description = reader.IsDBNull(2) ? null : reader.GetString(2)
+                        };
                         projects.Add(project);
                     }
                 }
