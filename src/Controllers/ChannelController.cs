@@ -21,11 +21,12 @@ namespace Thiskord_Back.Controllers
 
         [HttpPost("create")]
         
-        public IActionResult CreateChannel([FromBody] ChannelRequest req)
+        public async Task<IActionResult> CreateChannel([FromBody] ChannelRequest req)
         {
             try
             {
-                _channelService.Create(req.name, req.description, req.projectId);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                await _channelService.Create(req.name, req.description, req.projectId, userId);
                 return Ok(new { resultat = "success" });
 
             }
@@ -35,11 +36,11 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteChannel(int id)
+        public async Task<IActionResult> DeleteChannel(int id)
         {
             try
             {
-                _channelService.DeleteById(id);
+                await _channelService.DeleteById(id);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)
@@ -48,11 +49,11 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpPut("{id:int}")]
-        public IActionResult UpdateChannel([FromBody] ChannelRequest req, int id)
+        public async Task<IActionResult> UpdateChannel([FromBody] ChannelRequest req, int id)
         {
             try
             {
-                _channelService.Update(id, req.name, req.description);
+                await _channelService.Update(id, req.name, req.description);
                 return Ok(new { resultat = "success" });
             }
             catch (Exception ex)
