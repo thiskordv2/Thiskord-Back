@@ -53,7 +53,7 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
         }
 
         [Fact]
-        public void ChannelController_GetChannelsByProjectId_ReturnsOk()
+        public async Task ChannelController_GetChannelsByProjectId_ReturnsOk()
         {
             int projectId = 1;
             List<Channel> channels = new List<Channel>
@@ -63,7 +63,7 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
             };
             _mockChannelService.Setup(s => s.GetChannelsByProjectId(projectId)).Returns(channels);
             
-            var actionResult = _channelController.GetChannelsByProjectId(projectId);
+            var actionResult = await _channelController.GetChannelsByProjectId(projectId);
             actionResult.Should().BeOfType<OkObjectResult>();
             
             var okResult = actionResult as OkObjectResult;

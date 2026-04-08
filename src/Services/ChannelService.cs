@@ -13,6 +13,7 @@ namespace Thiskord_Back.Services
         void DeleteById(int channelId);
         Channel Update(int channel_id, string channel_name, string channel_desc);
         List<Channel> GetChannelsByProjectId(int projectId);
+        Task<List<Channel>> GetChannelsByProjectIdPerUser(int projectId, int userId);
     }
     
     public class ChannelService : IChannelService
@@ -142,6 +143,48 @@ namespace Thiskord_Back.Services
 
                     using var reader = command.ExecuteReader();
                     while (reader.Read())
+                    {
+                        var channel = new Channel
+                        {
+                            id = (int)reader["channel_id"],
+                            name = reader["channel_name"].ToString(),
+                            description = reader["channel_desc"].ToString()
+                        };
+                        channels.Add(channel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
+                throw;
+            }
+
+            return channels;
+        }
+        public async Task<List<Channel>> GetChannelsByProjectIdPerUser(int projectId, int userId)
+        {
+            var channels = new List<Channel>();
+
+            try
+            {
+                await using (var connection = _dbService.CreateConnection())
+                {
+                    await connection.OpenAsync();
+
+                    string query = @"SELECT c.channel_id, c.channel_name, c.channel_desc 
+                                     FROM Channel c 
+                                     INNER JOIN ALLOW a ON a.id_channel_user = c.channel_id
+                                     WHERE a.id_user = @userId
+                                     AND a.is_visible = 1
+                                     AND c.id_project = @projectId";
+
+                    await using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@projectId", projectId);
+                    command.Parameters.AddWithValue("@userId", userId);
+
+                    await using var reader = await command.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
                         var channel = new Channel
                         {

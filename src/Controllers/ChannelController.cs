@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Thiskord_Back.Models.Channel;
@@ -60,11 +61,12 @@ namespace Thiskord_Back.Controllers
             }
         }
         [HttpGet("project/{projectId:int}")]
-        public IActionResult GetChannelsByProjectId(int projectId)
+        public async Task<IActionResult> GetChannelsByProjectId(int projectId)
         {
             try
             {
-                var channels = _channelService.GetChannelsByProjectId(projectId);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var channels = await _channelService.GetChannelsByProjectIdPerUser(projectId, userId);
                 return Ok(channels);
             }
             catch (Exception ex)
