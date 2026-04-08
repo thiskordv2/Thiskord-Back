@@ -20,11 +20,12 @@ namespace Thiskord_Back.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult CreateProject([FromBody] ProjectRequest req)
+        public async Task <IActionResult> CreateProject([FromBody] ProjectRequest req)
         {
             try
             {
-                _projectService.Create(req.name, req.description);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                await _projectService.Create(req.name, req.description, userId);
                 return Ok(new { resultat = "success" });
 
             }

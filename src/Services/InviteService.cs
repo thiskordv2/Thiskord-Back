@@ -6,7 +6,7 @@ namespace Thiskord_Back.Services
 {
     public interface IInviteService
     {
-        Task<bool> AcceptInvite(string token);
+        Task<bool> AcceptInvite(string token, int currentUserId);
         Task<string> CreateInvite(int projectId, int creatorId, DateTime? expiresAt);
     }
     
@@ -20,7 +20,7 @@ namespace Thiskord_Back.Services
             _dbService = dbService;
             _logService = logService;
         }
-        public async Task<bool> AcceptInvite(string token)
+        public async Task<bool> AcceptInvite(string token, int currentUserId)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace Thiskord_Back.Services
 
                 const string query = @"
                     UPDATE dbo.Invitation_Token
-                    SET expires_at = GETDATE()
+                    SET expires_at = '2050-01-01'
                     OUTPUT INSERTED.it_project_id, INSERTED.it_creator_id
                     WHERE it_token = @token
                       AND (expires_at IS NULL OR expires_at > GETDATE());";
@@ -41,8 +41,14 @@ namespace Thiskord_Back.Services
                 if (await reader.ReadAsync())
                 {
                     int projectId = reader.GetInt32(0);
-                    int creatorId = reader.GetInt32(1);
+                    await reader.CloseAsync();
 
+                    const string query2 = @"
+                        INSERT INTO dbo.ACCESS (is_admin, is_root, id_account, id_project_account) VALUES (0, 0, @currentUserId , @projectId);";
+                    await using var cmd2 = new SqlCommand(query2, conn);
+                    cmd2.Parameters.AddWithValue("@currentUserId", currentUserId);
+                    cmd2.Parameters.AddWithValue("@projectId", projectId);
+                    await cmd2.ExecuteNonQueryAsync();
                     return true;
                 }
                 else
@@ -89,8 +95,8 @@ namespace Thiskord_Back.Services
                 cmd.Parameters.AddWithValue("@expiresAt", (object)invite.expiresAt ?? DBNull.Value);
                 await cmd.ExecuteNonQueryAsync();
 
-                //return $"https://api.emre-ak.fr/invite/{invite.token}";
-                return $"https://localhost:8080/invite/{invite.token}";
+                //return $"https://api.emre-ak.fr/api/invite/{invite.token}";
+                return $"http://localhost:8080/api/invite/{invite.token}";
             }
             catch (Exception e)
             {

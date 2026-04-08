@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Thiskord_Back.Services;
@@ -24,7 +25,8 @@ namespace Thiskord_Back.Controllers
         {
             try
             {
-                var success = await _inviteService.AcceptInvite(token);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var success = await _inviteService.AcceptInvite(token, userId);
                 if (!success) return BadRequest(new { error = "Invalid or expired token" });
                 return Ok(new { resultat = "Vous avez rejoint le projet avec succès" });
             }
@@ -40,7 +42,8 @@ namespace Thiskord_Back.Controllers
         {
             try
             {
-                var invite = await _inviteService.CreateInvite(request.projectId, request.creatorId, request.expiresAt);
+                var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)); 
+                var invite = await _inviteService.CreateInvite(request.projectId, creatorId, request?.expiresAt);
                 return Ok(new { token = invite });
             }
             catch (ArgumentException ex)

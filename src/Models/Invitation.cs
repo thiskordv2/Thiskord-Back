@@ -9,6 +9,6 @@ namespace Thiskord_Back.Models
         public DateTime createdAt { get; set; }
         public DateTime? expiresAt { get; set; } = null;
     }    
-    public record CreateInviteRequest(int projectId, int creatorId, DateTime? expiresAt);
+    public record CreateInviteRequest(int projectId, DateTime? expiresAt);
 }
 
