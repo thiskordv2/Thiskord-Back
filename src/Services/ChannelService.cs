@@ -9,10 +9,11 @@ namespace Thiskord_Back.Services
 {
     public interface IChannelService
     {
-        Channel Create(string channel_name, string channel_desc, int projectId);
-        void DeleteById(int channelId);
-        Channel Update(int channel_id, string channel_name, string channel_desc);
+        Task<Channel> Create(string channel_name, string channel_desc, int projectId, int userId);
+        Task DeleteById(int channelId);
+        Task<Channel> Update(int channel_id, string channel_name, string channel_desc);
         List<Channel> GetChannelsByProjectId(int projectId);
+        Task<List<Channel>> GetChannelsByProjectIdPerUser(int projectId, int userId);
     }
     
     public class ChannelService : IChannelService
@@ -25,7 +26,7 @@ namespace Thiskord_Back.Services
             this._dbService = dbService;
             this.logService = logService;
         }
-        public Channel Create(string channel_name, string channel_desc, int projectId)
+        public async Task<Channel> Create(string channel_name, string channel_desc, int projectId, int userId)
         {
 
             if (string.IsNullOrWhiteSpace(channel_name))
@@ -39,7 +40,7 @@ namespace Thiskord_Back.Services
 
             try
             {
-                using (var connection = _dbService.CreateConnection())
+                await using (var connection = _dbService.CreateConnection())
                 {
                     connection.Open();
 
@@ -47,13 +48,23 @@ namespace Thiskord_Back.Services
                                      VALUES (@Name, @Description, @ProjectId); 
                                      SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
-                    using var command = new SqlCommand(query, connection);
+                    await using var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Name", channel_name);
                     command.Parameters.AddWithValue("@Description", channel_desc);
                     command.Parameters.AddWithValue("@ProjectId", projectId);
 
-                    channel.id = (int)command.ExecuteScalar();
+                    channel.id = (int)await command.ExecuteScalarAsync();
+                }
 
+                await using (var connection = _dbService.CreateConnection())
+                {
+                    connection.Open();
+                    string query = @"INSERT INTO ALLOW (is_visible, is_writable, id_channel_user, id_user) 
+                                     VALUES (1, 1,  @channelId, @userId);";
+                    await using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@channelId", channel.id);
+                    command.Parameters.AddWithValue("@userId", userId);
+                    command.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
@@ -65,15 +76,15 @@ namespace Thiskord_Back.Services
             return channel;
         }
 
-        public void DeleteById(int channelId)
+        public async Task DeleteById(int channelId)
         {
             try
             {
-                using (var connection = _dbService.CreateConnection())
+                await using (var connection = _dbService.CreateConnection())
                 {
                     connection.Open();
                     string deleteQuery = "DELETE FROM Channel WHERE channel_id = @Id";
-                    using var deleteCommand = new SqlCommand(deleteQuery, connection);
+                    await using var deleteCommand = new SqlCommand(deleteQuery, connection);
                     deleteCommand.Parameters.AddWithValue("@Id", channelId);
                     deleteCommand.ExecuteNonQuery();
                 }
@@ -85,7 +96,7 @@ namespace Thiskord_Back.Services
             }
         }
 
-        public Channel Update(int channel_id, string channel_name, string channel_desc)
+        public async Task<Channel> Update(int channel_id, string channel_name, string channel_desc)
         {
 
             if (string.IsNullOrWhiteSpace(channel_name))
@@ -99,13 +110,13 @@ namespace Thiskord_Back.Services
 
             try
             {
-                using (var connection = _dbService.CreateConnection())
+                await using (var connection = _dbService.CreateConnection())
                 {
                     connection.Open();
 
                     string query = @"UPDATE Channel SET channel_name = @Name , channel_desc = @Description, modified_at = @date WHERE channel_id = @Id";
 
-                    using var command = new SqlCommand(query, connection);
+                    await using var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Id", channel_id);
                     command.Parameters.AddWithValue("@Name", channel_name);
                     command.Parameters.AddWithValue("@Description", channel_desc);
@@ -142,6 +153,48 @@ namespace Thiskord_Back.Services
 
                     using var reader = command.ExecuteReader();
                     while (reader.Read())
+                    {
+                        var channel = new Channel
+                        {
+                            id = (int)reader["channel_id"],
+                            name = reader["channel_name"].ToString(),
+                            description = reader["channel_desc"].ToString()
+                        };
+                        channels.Add(channel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
+                throw;
+            }
+
+            return channels;
+        }
+        public async Task<List<Channel>> GetChannelsByProjectIdPerUser(int projectId, int userId)
+        {
+            var channels = new List<Channel>();
+
+            try
+            {
+                await using (var connection = _dbService.CreateConnection())
+                {
+                    await connection.OpenAsync();
+
+                    string query = @"SELECT c.channel_id, c.channel_name, c.channel_desc 
+                                     FROM Channel c 
+                                     INNER JOIN ALLOW a ON a.id_channel_user = c.channel_id
+                                     WHERE a.id_user = @userId
+                                     AND a.is_visible = 1
+                                     AND c.id_project = @projectId";
+
+                    await using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@projectId", projectId);
+                    command.Parameters.AddWithValue("@userId", userId);
+
+                    await using var reader = await command.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
                         var channel = new Channel
                         {

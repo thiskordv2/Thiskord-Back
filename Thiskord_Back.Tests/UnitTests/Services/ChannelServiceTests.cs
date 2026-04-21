@@ -25,12 +25,12 @@ namespace Thiskord_Back.Tests.UnitTests.Services
         }
 
         [Fact]
-        public void ChannelService_Create_ReturnsChannel()
+        public async Task ChannelService_Create_ReturnsChannel()
         {
             string newChannelName = "NewChannel";
             string newChannelDescription = "NewChannelDescription";
             int projectId = 1;
-            var res = _channelService.Create(newChannelName, newChannelDescription, projectId);
+            var res = await _channelService.Create(newChannelName, newChannelDescription, projectId, 1);
             res.Should().BeOfType<Channel>();
             res.name.Should().Be(newChannelName);
             res.description.Should().Be(newChannelDescription);
@@ -50,12 +50,12 @@ namespace Thiskord_Back.Tests.UnitTests.Services
         }
 
         [Fact]
-        public void ChannelService_Update_ReturnsChannel()
+        public async Task ChannelService_Update_ReturnsChannel()
         {
             int channelId = 2;
             string newChannelName = "NewChannelName";
             string newChannelDescription = "NewChannelDescription";
-            var res = _channelService.Update(channelId, newChannelName, newChannelDescription);
+            var res = await _channelService.Update(channelId, newChannelName, newChannelDescription);
             res.Should().BeOfType<Channel>();
             res.name.Should().Be(newChannelName);
             res.description.Should().Be(newChannelDescription);

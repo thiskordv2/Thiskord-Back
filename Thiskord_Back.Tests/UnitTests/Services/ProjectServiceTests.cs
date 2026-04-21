@@ -24,9 +24,9 @@ namespace Thiskord_Back.Tests.UnitTests.Services
         }
 
         [Fact]
-        public void ProjectService_Create_ReturnsProject()
+        public async Task ProjectService_Create_ReturnsProject()
         {
-            Project project = _projectService.Create("ProjectTest", "ProjectTestDescription");
+            Project project = await _projectService.Create("ProjectTest", "ProjectTestDescription", 1);
             project.Should().NotBeNull();
             project.name.Should().Be("ProjectTest");
             project.description.Should().Be("ProjectTestDescription");
