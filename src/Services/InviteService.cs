@@ -74,6 +74,24 @@ namespace Thiskord_Back.Services
 
                 using var conn = _dbService.CreateConnection();
                 await conn.OpenAsync();
+
+                const string checkQuery = @"
+                SELECT TOP 1 it_token 
+                FROM dbo.Invitation_Token 
+                WHERE it_project_id = @projectId 
+                  AND it_creator_id = @creatorId 
+                  AND (expires_at IS NULL OR expires_at > GETUTCDATE())";
+                
+                using (var checkCmd = new SqlCommand(checkQuery, conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@projectId", projectId);
+                    checkCmd.Parameters.AddWithValue("@creatorId", creatorId);
+
+                    var existingToken = await checkCmd.ExecuteScalarAsync() as string;
+                    if (existingToken != null)
+                        return $"http://localhost:8080/api/invite/{existingToken}";
+                }
+                
                 Invitation invite = new Invitation()
                 {
                     token = Guid.NewGuid().ToString("N"),
