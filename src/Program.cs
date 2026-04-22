@@ -25,7 +25,8 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IInviteService, InviteService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AccountService>();
-builder.Services.AddScoped<InscriptionService>();
+builder.Services.AddScoped<SprintService>();
+builder.Services.AddScoped<TaskService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

@@ -100,11 +100,13 @@ CREATE TABLE dbo.Sprint
 (
     sprint_id INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
     sprint_goal VARCHAR(255),
-    sprint_begin_date DATETIME2,
-    sprint_end_date DATETIME2,
+    sprint_begin_date VARCHAR(255),
+    sprint_end_date VARCHAR(255),
     sprint_status VARCHAR(50) DEFAULT 'To Do',
-    created_at DATETIME2 DEFAULT GETDATE(),
-    modified_at DATETIME2
+    id_project_sprint INT NULL,
+    created_at VARCHAR(255),
+    modified_at VARCHAR(255),
+    CONSTRAINT fk_id_project_sprint FOREIGN KEY (id_project_sprint) REFERENCES dbo.Project(project_id) ON DELETE SET NULL
 );
 END
 GO
