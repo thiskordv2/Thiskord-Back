@@ -72,7 +72,7 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
                 new Channel() { id = 1, name = "Channel 1", description = "Description 1" },
                 new Channel() { id = 2, name = "Channel 2", description = "Description 2" }
             };
-            _mockChannelService.Setup(s => s.GetChannelsByProjectId(projectId)).Returns(channels);
+            _mockChannelService.Setup(s => s.GetChannelsByProjectIdPerUser(projectId, 1)).ReturnsAsync(channels);
             
             var actionResult = await _channelController.GetChannelsByProjectId(projectId);
             actionResult.Should().BeOfType<OkObjectResult>();

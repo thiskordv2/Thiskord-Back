@@ -62,8 +62,10 @@ namespace Thiskord_Back.Services
                 accessCmd.Parameters.AddWithValue("@ProjectId", project.id);
 
                 await accessCmd.ExecuteNonQueryAsync();
-                await transaction.CommitAsync();
+                
                 await _channelService.Create("Général", "Votre premier channel", project.id.Value, userId);
+                
+                await transaction.CommitAsync();
                 return project;
             }
             catch (Exception ex)
