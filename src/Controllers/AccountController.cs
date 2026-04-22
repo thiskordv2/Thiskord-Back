@@ -31,7 +31,12 @@ namespace Thiskord_Back.Controllers
             _accountService.patchAccount(req);
             return Ok();
         }
-
+        [HttpDelete("account/{id}")]
+        public async Task<IActionResult> DeleteAccount(int id)
+        {
+            await _accountService.DeleteAccount(id);
+            return NoContent();
+        }
         [HttpPost("account-password")]
         public IActionResult patchAccountPassword([FromBody] UserAccount req)
         {
