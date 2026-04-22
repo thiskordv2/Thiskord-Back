@@ -71,5 +71,37 @@
                 int res = command.ExecuteNonQuery();
                 return res;
             }
+            
+            public async Task DeleteAccount(int user_id) //Suppression de compte z
+            {
+                try
+                {
+                    await using (var connection = _dbService.CreateConnection())
+                    {
+                        connection.Open();
+                        string deleteRelatedData = @"
+                        DELETE FROM Account WHERE user_id = @user_id;
+                        DELETE FROM Account WHERE user_password = @user_password;
+                        DELETE FROM Account WHERE user_mail = @user_mail
+                        DELETE FROM Account WHERE user_picture = @user_picture;";
+                        using (var command = new SqlCommand(deleteRelatedData, connection))
+                        {
+                            command.Parameters.AddWithValue("@UserId", user_id);
+                            await command.ExecuteNonQueryAsync();
+                        }
+                        string deleteAccount = "DELETE FROM Account WHERE user_id = @user_id;";
+
+                        using (var command = new SqlCommand(deleteAccount, connection))
+                        {
+                            command.Parameters.AddWithValue("@user_id", user_id);
+                            await command.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
         }
     }
