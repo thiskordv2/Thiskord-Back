@@ -19,12 +19,12 @@ namespace Thiskord_Back.Services
     public class ChannelService : IChannelService
     {
         private readonly IDbConnectionService _dbService;
-        private readonly ILogService logService;
+        private readonly ILogService _logService;
 
         public ChannelService(IDbConnectionService dbService, ILogService logService)
         {
-            this._dbService = dbService;
-            this.logService = logService;
+            _dbService = dbService;
+            _logService = logService;
         }
         public async Task<Channel> Create(string channel_name, string channel_desc, int projectId, int userId)
         {
@@ -69,7 +69,7 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog($"Error in Create: {ex.Message}");
+                _logService.CreateLog($"Error in Create: {ex.Message}");
                 throw;
             }
 
@@ -91,7 +91,7 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog($"Error in DeleteById: {ex.Message}");
+                _logService.CreateLog($"Error in DeleteById: {ex.Message}");
                 throw;
             }
         }
@@ -128,7 +128,7 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog($"Error in Update: {ex.Message}");
+                _logService.CreateLog($"Error in Update: {ex.Message}");
                 throw;
             }
 
@@ -166,7 +166,7 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
+                _logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
                 throw;
             }
 
@@ -208,7 +208,7 @@ namespace Thiskord_Back.Services
             }
             catch (Exception ex)
             {
-                logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
+                _logService.CreateLog($"Error in GetChannelsByProjectId for projectId {projectId}: {ex.Message}");
                 throw;
             }
 

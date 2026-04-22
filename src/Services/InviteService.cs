@@ -7,18 +7,20 @@ namespace Thiskord_Back.Services
     public interface IInviteService
     {
         Task<bool> AcceptInvite(string token, int currentUserId);
-        Task<string> CreateInvite(int projectId, int creatorId, DateTime? expiresAt);
+        Task<string> CreateInvite(int projectId, int creatorId, string? expiresAt);
     }
     
     public class InviteService : IInviteService
     {
         private readonly IDbConnectionService _dbService;
         private readonly ILogService _logService;
+        private readonly IConfiguration _config;
 
-        public InviteService(IDbConnectionService dbService, ILogService logService)
+        public InviteService(IDbConnectionService dbService, ILogService logService, IConfiguration config)
         {
             _dbService = dbService;
             _logService = logService;
+            _config = config;
         }
         public async Task<bool> AcceptInvite(string token, int currentUserId)
         {
@@ -26,11 +28,10 @@ namespace Thiskord_Back.Services
             {
                 using var conn = _dbService.CreateConnection();
                 await conn.OpenAsync();
-
                 const string query = @"
                     UPDATE dbo.Invitation_Token
                     SET expires_at = '2050-01-01'
-                    OUTPUT INSERTED.it_project_id, INSERTED.it_creator_id
+                    OUTPUT INSERTED.it_project_id
                     WHERE it_token = @token
                       AND (expires_at IS NULL OR expires_at > GETDATE());";
 
@@ -42,7 +43,20 @@ namespace Thiskord_Back.Services
                 {
                     int projectId = reader.GetInt32(0);
                     await reader.CloseAsync();
+                    
+                    const string checkMember = @"
+                    SELECT COUNT(1) FROM dbo.ACCESS 
+                    WHERE id_account = @currentUserId AND id_project_account = @projectId";
+                
+                    using (var checkCmd = new SqlCommand(checkMember, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@projectId", projectId);
+                        checkCmd.Parameters.AddWithValue("@currentUserId", currentUserId);
 
+                        var count = Convert.ToInt32(await checkCmd.ExecuteScalarAsync());
+                        if (count > 0) return true;
+                    }
+                    
                     const string query2 = @"
                         INSERT INTO dbo.ACCESS (is_admin, is_root, id_account, id_project_account) VALUES (0, 0, @currentUserId , @projectId);";
                     await using var cmd2 = new SqlCommand(query2, conn);
@@ -51,10 +65,8 @@ namespace Thiskord_Back.Services
                     await cmd2.ExecuteNonQueryAsync();
                     return true;
                 }
-                else
-                {
-                    return false; 
-                }
+
+                return false;
             }
             catch (Exception e)
             {
@@ -63,18 +75,36 @@ namespace Thiskord_Back.Services
             }
         }
 
-        public async Task<string> CreateInvite(int projectId, int creatorId, DateTime? expiresAt)
+        public async Task<string> CreateInvite(int projectId, int creatorId, string? expireAt)
         {
+            DateTime? expiresAt = DateTime.TryParse(expireAt, out var parsed) ? parsed : null;
+            using var conn = _dbService.CreateConnection();
+            await conn.OpenAsync();
+            const string isUserAdminQuery = @"
+                SELECT is_admin, is_root 
+                FROM dbo.ACCESS 
+                WHERE id_account = @creatorId AND id_project_account = @projectId";
+            await using (var cmd1 = new SqlCommand(isUserAdminQuery, conn))
+            {
+                cmd1.Parameters.AddWithValue("@creatorId", creatorId);
+                cmd1.Parameters.AddWithValue("@projectId", projectId);
+                using var reader = await cmd1.ExecuteReaderAsync();
+                if (!await reader.ReadAsync()) 
+                    return "Utilisateur non membre du projet";
+
+                bool isAdmin = reader.GetBoolean(0);
+                bool isRoot  = reader.GetBoolean(1);
+
+                if (!isAdmin && !isRoot)
+                    return "Utilisateur non administrateur du projet";
+            }
 
             try
             {
                 if (expiresAt.HasValue && expiresAt.Value < DateTime.UtcNow)
                     throw new ArgumentException("La date d'expiration ne peut pas être dans le passé.",
                         nameof(expiresAt));
-
-                using var conn = _dbService.CreateConnection();
-                await conn.OpenAsync();
-
+                
                 const string checkQuery = @"
                 SELECT TOP 1 it_token 
                 FROM dbo.Invitation_Token 
@@ -89,6 +119,7 @@ namespace Thiskord_Back.Services
 
                     var existingToken = await checkCmd.ExecuteScalarAsync() as string;
                     if (existingToken != null)
+                        //return $"{_config["AppSettings:BaseUrl"]}/api/invite/{existingToken}"; 
                         return $"http://localhost:8080/api/invite/{existingToken}";
                 }
                 
@@ -113,7 +144,7 @@ namespace Thiskord_Back.Services
                 cmd.Parameters.AddWithValue("@expiresAt", (object)invite.expiresAt ?? DBNull.Value);
                 await cmd.ExecuteNonQueryAsync();
 
-                //return $"https://api.emre-ak.fr/api/invite/{invite.token}";
+                //return $"{_config["AppSettings:BaseUrl"]}/api/invite/{invite.token}";
                 return $"http://localhost:8080/api/invite/{invite.token}";
             }
             catch (Exception e)

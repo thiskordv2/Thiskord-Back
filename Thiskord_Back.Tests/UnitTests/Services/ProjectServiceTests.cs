@@ -20,7 +20,7 @@ namespace Thiskord_Back.Tests.UnitTests.Services
                 .Setup(db => db.CreateConnection())
                 .Returns(() => new SqlConnection(fixture.ConnectionString));
             
-            _projectService = new ProjectService(mockDbService.Object, null);
+            _projectService = new ProjectService(mockDbService.Object, null, null);
         }
 
         [Fact]

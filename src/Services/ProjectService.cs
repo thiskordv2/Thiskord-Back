@@ -20,11 +20,13 @@ namespace Thiskord_Back.Services
         private readonly IDbConnectionService _dbService;
 
         private readonly ILogService _logService;
+        private readonly IChannelService _channelService;
 
-        public ProjectService(IDbConnectionService dbService, ILogService logService)
+        public ProjectService(IDbConnectionService dbService, ILogService logService, IChannelService channelService)
         {
-            this._dbService = dbService;
-            this._logService = logService;
+            _dbService = dbService;
+            _logService = logService;
+            _channelService = channelService;
         }
          public async Task<Project> Create(string projectName, string projectDesc, int userId)
         {
@@ -60,8 +62,8 @@ namespace Thiskord_Back.Services
                 accessCmd.Parameters.AddWithValue("@ProjectId", project.id);
 
                 await accessCmd.ExecuteNonQueryAsync();
-
                 await transaction.CommitAsync();
+                await _channelService.Create("Général", "Votre premier channel", project.id.Value, userId);
                 return project;
             }
             catch (Exception ex)
