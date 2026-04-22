@@ -9,6 +9,7 @@ namespace Thiskord_Back.Services
         Task<List<MessageDTO>> GetAllMessage(int channelId);
         Task<MessageDTO> SendMessage(int channelId, int userId, string message, string username);
         Task DeleteMessage(int messageId, int channelId);
+        Task<MessageDTO> UpdateMessage(int messageId, int channelId, string newContent);
     }
     
     public class MessageService : IMessageService
@@ -127,6 +128,58 @@ namespace Thiskord_Back.Services
             catch (Exception e)
             {
                 logService.AddLog(1,$"Error in DeleteMessage: {e.Message}");
+                throw;
+            }
+        }
+
+        public async Task<MessageDTO> UpdateMessage(int messageId, int channelId, string newContent)
+        {
+            try
+            {
+                using var conn = _dbService.CreateConnection();
+                await conn.OpenAsync();
+
+                const string query = @"
+                    UPDATE dbo.Message 
+                    SET message_content = @newContent
+                    WHERE message_id = @message_id AND id_channel_author = @channel_id;
+
+                    SELECT 
+                        m.message_id,
+                        m.message_content,
+                        m.created_at,
+                        a.user_name
+                    FROM dbo.Message m
+                    LEFT JOIN dbo.Account a ON a.user_id = m.id_author
+                    WHERE m.message_id = @message_id;";
+
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@message_id", messageId);
+                cmd.Parameters.AddWithValue("@channel_id", channelId);
+                cmd.Parameters.AddWithValue("@newContent", newContent);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    var id = reader.GetInt32(0);
+                    var content = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                    var createdAt = reader.IsDBNull(2) ? DateTime.UtcNow : reader.GetDateTime(2);
+                    var username = reader.IsDBNull(3) ? "Unknown user" : reader.GetString(3);
+
+                    var parisTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
+                    var parisTime = TimeZoneInfo.ConvertTimeFromUtc(
+                        DateTime.SpecifyKind(createdAt, DateTimeKind.Utc),
+                        parisTz
+                    );
+
+                    return new MessageDTO(username, id, content, parisTime.ToString("dd/MM HH:mm"));
+                }
+
+                throw new Exception("Message not found or update failed");
+            }
+            catch (Exception e)
+            {
+                logService.AddLog(1, $"Error in UpdateMessage: {e.Message}");
                 throw;
             }
         }
