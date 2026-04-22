@@ -30,10 +30,10 @@ namespace Thiskord_Back.Controllers
                 if (!success) return BadRequest(new { error = "Invalid or expired token" });
                 return Ok(new { resultat = "Vous avez rejoint le projet avec succès" });
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 _logService.CreateLog($"Error in AcceptInvite: {ex.Message}");
-                return  Ok(new{ error = ex.Message });
+                return StatusCode(500, new { error = "Une erreur interne est survenue" });
             }
         }
         
@@ -44,7 +44,7 @@ namespace Thiskord_Back.Controllers
             {
                 var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)); 
                 var invite = await _inviteService.CreateInvite(request.projectId, creatorId, request?.expiresAt);
-                return Ok(new { token = invite });
+                return Ok(new { inviteToken = invite });
             }
             catch (ArgumentException ex)
             {

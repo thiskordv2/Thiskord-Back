@@ -69,7 +69,7 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
                 new Project() { id = 1, name = "project 1", description = "Description 1" },
                 new Project() { id = 2, name = "project 2", description = "Description 2" }
             };
-            _mockProjectService.Setup(s => s.GetAll()).Returns(projects);
+            _mockProjectService.Setup(s => s.GetAllProjectsForUser(1)).ReturnsAsync(projects);
             
             var actionResult = await _projectController.GetAllProjects();
             actionResult.Should().BeOfType<OkObjectResult>();

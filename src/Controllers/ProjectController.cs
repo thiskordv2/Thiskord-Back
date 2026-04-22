@@ -67,19 +67,19 @@ namespace Thiskord_Back.Controllers
             }
         }
         
-            [HttpGet("all")]
-            public async Task<IActionResult> GetAllProjects()
-            {
-                try
-                {
-                    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                    var projects = await _projectService.GetAllProjectsForUser(userId);
-                    return Ok(projects);
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
-                }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllProjects()
+        {
+            try 
+            { 
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)); 
+                var projects = await _projectService.GetAllProjectsForUser(userId); 
+                return Ok(projects);
             }
+            catch (Exception ex) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = ex.Message });
+            }
+        }
     }
 }
