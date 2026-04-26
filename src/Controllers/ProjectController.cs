@@ -27,7 +27,6 @@ namespace Thiskord_Back.Controllers
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 await _projectService.Create(req.name, req.description, userId);
                 return Ok(new { resultat = "success" });
-
             }
             catch (System.Exception ex)
             {

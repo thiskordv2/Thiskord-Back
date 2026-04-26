@@ -62,11 +62,7 @@ namespace Thiskord_Back.Services
                 accessCmd.Parameters.AddWithValue("@ProjectId", project.id);
 
                 await accessCmd.ExecuteNonQueryAsync();
-                
-                await _channelService.Create("Général", "Votre premier channel", project.id.Value, userId);
-                
                 await transaction.CommitAsync();
-                return project;
             }
             catch (Exception ex)
             {
@@ -74,6 +70,17 @@ namespace Thiskord_Back.Services
                 _logService.CreateLog($"Erreur création projet: {ex.Message}");
                 throw; 
             }
+
+            try
+            {
+                await _channelService.Create("Général", "Votre premier channel", project.id.Value, userId);
+            }
+            catch (Exception ex)
+            {
+                _logService.CreateLog($"Erreur création projet: {ex.Message}");
+            }
+            return project;
+
         }
         public void DeleteById(int projectId)
         {
