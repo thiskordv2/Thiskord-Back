@@ -11,7 +11,7 @@ namespace Thiskord_Back.Controllers
     {
         private readonly IInscriptionService _inscriptionService;
         
-        public InscriptionController(IInscriptionService inscriptionService, LogService logService)
+        public InscriptionController(IInscriptionService inscriptionService)
         {
             _inscriptionService = inscriptionService;
         }
