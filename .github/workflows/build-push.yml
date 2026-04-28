@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.0
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
         
       - name: Log in to Container Registry
         uses: docker/login-action@v4.1.0
@@ -36,4 +34,4 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.workflow_run.head_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}
