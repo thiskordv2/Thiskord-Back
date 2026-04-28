@@ -119,8 +119,8 @@ namespace Thiskord_Back.Services
 
                     var existingToken = await checkCmd.ExecuteScalarAsync() as string;
                     if (existingToken != null)
-                        //return $"{_config["AppSettings:BaseUrl"]}/api/invite/{existingToken}"; 
-                        return $"http://localhost:8080/api/invite/{existingToken}";
+                        return $"{_config["AppSettings:BaseUrl"]}/api/invite/{existingToken}"; 
+                        //return $"http://localhost:8080/api/invite/{existingToken}";
                 }
                 
                 Invitation invite = new Invitation()
@@ -144,8 +144,8 @@ namespace Thiskord_Back.Services
                 cmd.Parameters.AddWithValue("@expiresAt", (object)invite.expiresAt ?? DBNull.Value);
                 await cmd.ExecuteNonQueryAsync();
 
-                //return $"{_config["AppSettings:BaseUrl"]}/api/invite/{invite.token}";
-                return $"http://localhost:8080/api/invite/{invite.token}";
+                return $"{_config["AppSettings:BaseUrl"]}/api/invite/{invite.token}";
+                //return $"http://localhost:8080/api/invite/{invite.token}";
             }
             catch (Exception e)
             {
