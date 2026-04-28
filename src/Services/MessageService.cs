@@ -41,6 +41,9 @@ namespace Thiskord_Back.Services
                 cmd.Parameters.AddWithValue("@text", message);
                 using var reader = await cmd.ExecuteReaderAsync();
                 
+                if (!await reader.ReadAsync())
+                    throw new Exception("Insert failed, no data returned.");
+                
                 var id = reader.GetInt32(0);
                 var createdAt = reader.GetDateTime(1);
                 
