@@ -46,5 +46,24 @@ namespace Thiskord_Back.Hubs
             await Clients.Group(channelId.ToString())
                 .SendAsync("DeleteMessage", messageId);
         }
+
+        public async Task EditMessage(int channelId, int messageId, string newContent)
+        {
+            try
+            {
+                var updatedMessage = await _messageService.UpdateMessage(messageId, channelId, newContent);
+                await Clients.Group(channelId.ToString())
+                    .SendAsync("EditMessage", updatedMessage.Id, updatedMessage.Content, updatedMessage.CreatedAt);
+            }
+            catch (HubException ex)
+            {
+                await Clients.Caller.SendAsync("Error", ex.Message);
+            }
+            catch (Exception ex)
+            {
+                await Clients.Caller.SendAsync("Error", "Erreur lors de l'édition du message");
+                throw;
+            }
+        }
     }
 }
