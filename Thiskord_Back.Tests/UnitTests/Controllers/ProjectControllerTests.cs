@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Thiskord_Back.Controllers;
@@ -16,16 +18,26 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
         {
             _mockProjectService = new Mock<IProjectService>();
             _projectController = new ProjectController(_mockProjectService.Object);
+            
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1"), // Identifiant 1 par ex
+            }, "mock"));
+
+            _projectController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = user }
+            };
         }
 
         [Fact]
-        public void projectController_CreateProject_ReturnsOk()
+        public async Task projectController_CreateProject_ReturnsOk()
         {
             var request = new ProjectRequest() { name = "Test project", description = "This is a test project" };
             var responseproject = new Project() { id = 1, name = request.name, description = request.description }; 
-            _mockProjectService.Setup(s => s.Create(request.name, request.description)).Returns(responseproject);
+            _mockProjectService.Setup(s => s.Create(request.name, request.description, 1)).ReturnsAsync(responseproject);
             
-            var actualResult = _projectController.CreateProject(request);
+            var actualResult = await _projectController.CreateProject(request);
 
             actualResult.Should().BeOfType<OkObjectResult>();
         }
@@ -50,16 +62,16 @@ namespace Thiskord_Back.Tests.UnitTests.Controllers
         }
 
         [Fact]
-        public void projectController_GetAllProjects_ReturnsOk()
+        public async Task projectController_GetAllProjects_ReturnsOk()
         {
             List<Project> projects = new List<Project>
             {
                 new Project() { id = 1, name = "project 1", description = "Description 1" },
                 new Project() { id = 2, name = "project 2", description = "Description 2" }
             };
-            _mockProjectService.Setup(s => s.GetAll()).Returns(projects);
+            _mockProjectService.Setup(s => s.GetAllProjectsForUser(1)).ReturnsAsync(projects);
             
-            var actionResult = _projectController.GetAllProjects();
+            var actionResult = await _projectController.GetAllProjects();
             actionResult.Should().BeOfType<OkObjectResult>();
             
             var okResult = actionResult as OkObjectResult;

@@ -3,7 +3,7 @@ services:
     image: mcr.microsoft.com/dotnet/sdk:9.0
     working_dir: /App
     volumes:
-      - ./:/App
+      - ./src/:/App
       - /App/obj/
       - /App/bin/
     ports:

@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="IntegrationTests\Api\" />
-    <Folder Include="IntegrationTests\Database\" />
     <Folder Include="SecurityTests\" />
   </ItemGroup>
 

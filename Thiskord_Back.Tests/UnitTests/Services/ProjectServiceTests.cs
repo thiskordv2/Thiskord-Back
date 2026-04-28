@@ -20,13 +20,20 @@ namespace Thiskord_Back.Tests.UnitTests.Services
                 .Setup(db => db.CreateConnection())
                 .Returns(() => new SqlConnection(fixture.ConnectionString));
             
-            _projectService = new ProjectService(mockDbService.Object, null);
+            var mockLogService = new Mock<ILogService>();
+
+            var mockChannelService = new Mock<IChannelService>();
+            mockChannelService
+                .Setup(c => c.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(new Thiskord_Back.Models.Channel.Channel { id = 1, name = "General" });
+            
+            _projectService = new ProjectService(mockDbService.Object, mockLogService.Object, mockChannelService.Object);
         }
 
         [Fact]
-        public void ProjectService_Create_ReturnsProject()
+        public async Task ProjectService_Create_ReturnsProject()
         {
-            Project project = _projectService.Create("ProjectTest", "ProjectTestDescription");
+            Project project = await _projectService.Create("ProjectTest", "ProjectTestDescription", 1);
             project.Should().NotBeNull();
             project.name.Should().Be("ProjectTest");
             project.description.Should().Be("ProjectTestDescription");

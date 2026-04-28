@@ -5,11 +5,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace Thiskord_Back.Services
 {
-    // La classe implémente l'interface ILogService
-    public class LogService
+    public interface ILogService
+    {
+        void AddLog(int userId, string message);
+        void CreateLog(string message);
+    }
+    public class LogService : ILogService
     {
         private readonly string _connectionString;
-
         public LogService(IConfiguration config)
         {
             // Récupération de la chaîne de connexion via l'injection de IConfiguration
