@@ -4,11 +4,16 @@ using BCrypt.Net;
 
 namespace Thiskord_Back.Services
 {
-    public class InscriptionService
+    public interface IInscriptionService
+    {
+        Task<UserAccount> InscriptionUser(string user_name, string user_mail, string user_password, string user_picture);
+    }
+    
+    public class InscriptionService : IInscriptionService
     {
         private readonly IDbConnectionService _dbService;
         private readonly ILogService _logService;
-
+        
         public InscriptionService(IDbConnectionService dbService, ILogService logService)
         {
             _dbService = dbService;

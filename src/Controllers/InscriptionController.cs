@@ -9,12 +9,11 @@ namespace Thiskord_Back.Controllers
     [ApiController]
     public class InscriptionController : ControllerBase
     {
-        private readonly InscriptionService _inscriptionService;
+        private readonly IInscriptionService _inscriptionService;
         
-        public InscriptionController(InscriptionService inscriptionService, LogService logService)
+        public InscriptionController(IInscriptionService inscriptionService, LogService logService)
         {
             _inscriptionService = inscriptionService;
-            
         }
 
         [HttpPost("register")]

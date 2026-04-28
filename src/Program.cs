@@ -24,6 +24,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IInviteService, InviteService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IInscriptionService, InscriptionService>();
 builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<SprintService>();
 builder.Services.AddScoped<TaskService>();
