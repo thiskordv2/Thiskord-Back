@@ -15,24 +15,30 @@ namespace Thiskord_Back.Services
         
         public void createTask(SprintTask req)
         {
-            string timestamp = new DateTime().ToString("yyyyMMddHHmmssffff");
-            var conn = _dbService.CreateConnection();
+            int taskId = 0;
+            DateTime now = DateTime.Now;
+            using var conn = _dbService.CreateConnection();
             conn.Open();
-            string query = "INSERT INTO Task"
-                + " SET (task_title, task_desc, is_subtask, task_status, created_at, modified_at, id_creator, id_resp, id_project_task, id_parent_task)"
-                + " VALUES (@taskTitle, @taskDesc, @isSubtask, @taskStatus, @createdAt, @modifiedAt, @idCreator, @idResp, @idProject, @idParent);";
-            var command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("taskTitle", req.task_title);
-            command.Parameters.AddWithValue("taskDesc", req.task_desc);
-            command.Parameters.AddWithValue("isSubtask", req.is_subtask);
-            command.Parameters.AddWithValue("taskStatus", req.task_status);
-            command.Parameters.AddWithValue("createdAt", timestamp);
-            command.Parameters.AddWithValue("modifiedAt", timestamp);
-            command.Parameters.AddWithValue("idCreator", req.id_creator);
-            command.Parameters.AddWithValue("idResp", req.id_resp);
-            command.Parameters.AddWithValue("idProject", req.id_project_task);
-            command.Parameters.AddWithValue("idParent", req.id_parent_task);
-            command.ExecuteNonQuery();
+            string query = "INSERT INTO dbo.Task (task_title, task_desc, is_subtask, task_status, created_at, modified_at, id_creator, id_resp, id_project_task, id_parent_task) "
+                + "OUTPUT INSERTED.task_id "
+                + "VALUES (@taskTitle, @taskDesc, @isSubtask, @taskStatus, @createdAt, @modifiedAt, @idCreator, @idResp, @idProject, @idParent);";
+            using var command = new SqlCommand(query, conn);
+            command.Parameters.AddWithValue("@taskTitle", req.task_title);
+            command.Parameters.AddWithValue("@taskDesc", req.task_desc);
+            command.Parameters.AddWithValue("@isSubtask", req.is_subtask);
+            command.Parameters.AddWithValue("@taskStatus", req.task_status);
+            command.Parameters.AddWithValue("@createdAt", now);
+            command.Parameters.AddWithValue("@modifiedAt", now);
+            command.Parameters.AddWithValue("@idCreator", req.id_creator);
+            command.Parameters.AddWithValue("@idResp", req.id_resp);
+            command.Parameters.AddWithValue("@idProject", req.id_project_task);
+            command.Parameters.AddWithValue("@idParent", req.id_parent_task.HasValue ? req.id_parent_task.Value : DBNull.Value);
+            taskId = (int)command.ExecuteScalar();
+            string queryInclude = "INSERT INTO dbo.INCLUDE (id_sprint, id_task) VALUES (@idSprint, @idTask);";
+            using var commandInclude = new SqlCommand(queryInclude, conn);
+            commandInclude.Parameters.AddWithValue("@idSprint", req.id_sprint);
+            commandInclude.Parameters.AddWithValue("@idTask", taskId);
+            commandInclude.ExecuteNonQuery();
         }
         /**
          * @Param id de la tâche
@@ -53,23 +59,21 @@ namespace Thiskord_Back.Services
         public int updateTask(SprintTask req)
         {
             int res = 0;
-            string timestamp = new DateTime().ToString("yyyyMMddHHmmssffff");
-            var conn = _dbService.CreateConnection();
+            DateTime now = DateTime.Now;
+            using var conn = _dbService.CreateConnection();
             conn.Open();
-            string query = "INSERT INTO Task"
-                + " SET (task_title, task_desc, is_subtask, task_status, modified_at, id_creator, id_resp, id_project_task, id_parent_task)"
-                + " VALUES (@taskTitle, @taskDesc, @isSubtask, @taskStatus, @modifiedAt, @idCreator, @idResp, @idProject, @idParent) WHERE task_id = @idTask;";
-            var command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("taskTitle", req.task_title);
-            command.Parameters.AddWithValue("taskDesc", req.task_desc);
-            command.Parameters.AddWithValue("isSubtask", req.is_subtask);
-            command.Parameters.AddWithValue("taskStatus", req.task_status);
-            command.Parameters.AddWithValue("modifiedAt", timestamp);
-            command.Parameters.AddWithValue("idCreator", req.id_creator);
-            command.Parameters.AddWithValue("idResp", req.id_resp);
-            command.Parameters.AddWithValue("idProject", req.id_project_task);
-            command.Parameters.AddWithValue("idParent", req.id_parent_task);
-            command.Parameters.AddWithValue("idTask", req.task_id);
+            string query = "UPDATE dbo.Task SET task_title = @taskTitle, task_desc = @taskDesc, is_subtask = @isSubtask, task_status = @taskStatus, modified_at = @modifiedAt, id_creator = @idCreator, id_resp = @idResp, id_project_task = @idProject, id_parent_task = @idParent WHERE task_id = @idTask;";
+            using var command = new SqlCommand(query, conn);
+            command.Parameters.AddWithValue("@taskTitle", req.task_title);
+            command.Parameters.AddWithValue("@taskDesc", req.task_desc);
+            command.Parameters.AddWithValue("@isSubtask", req.is_subtask);
+            command.Parameters.AddWithValue("@taskStatus", req.task_status);
+            command.Parameters.AddWithValue("@modifiedAt", now);
+            command.Parameters.AddWithValue("@idCreator", req.id_creator);
+            command.Parameters.AddWithValue("@idResp", req.id_resp);
+            command.Parameters.AddWithValue("@idProject", req.id_project_task);
+            command.Parameters.AddWithValue("@idParent", req.id_parent_task.HasValue ? req.id_parent_task.Value : DBNull.Value);
+            command.Parameters.AddWithValue("@idTask", req.task_id);
             res = command.ExecuteNonQuery();
             return res;
         }
@@ -82,9 +86,10 @@ namespace Thiskord_Back.Services
             List<SprintTask> res = new List<SprintTask>(); 
             var conn = _dbService.CreateConnection();
             conn.Open();
-            string query = "SELECT * FROM Task WHERE id_project_task = @idProject AND is_subtask = false;";
+            string query = "SELECT Task.* FROM Task, INCLUDE WHERE  Task.is_subtask = @false AND Task.task_id = INCLUDE.id_task AND INCLUDE.id_sprint = @id_sprint;";
             var command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("idProject", id);
+            command.Parameters.AddWithValue("id_sprint", id);
+            command.Parameters.AddWithValue("false", false);
             var reader = command.ExecuteReader();
             while (reader.Read())
             {
