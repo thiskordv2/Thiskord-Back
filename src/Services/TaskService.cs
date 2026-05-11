@@ -49,14 +49,15 @@ namespace Thiskord_Back.Services
             int res = 0;
             var conn = _dbService.CreateConnection();
             conn.Open();
-            string query = "DELETE FROM Task WHERE task_id = @idTache;";
-            var command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("idTache", id);
-            res = command.ExecuteNonQuery();
             string queryInclude = "DELETE FROM INCLUDE WHERE id_task = @idTache;";
             var commandInclude = new SqlCommand(queryInclude, conn);
             commandInclude.Parameters.AddWithValue("idTache", id);
             commandInclude.ExecuteNonQuery();
+            string query = "DELETE FROM Task WHERE task_id = @idTache;";
+            var command = new SqlCommand(query, conn);
+            command.Parameters.AddWithValue("idTache", id);
+            res = command.ExecuteNonQuery();
+            
             return res;
         }
 
