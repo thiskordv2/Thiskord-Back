@@ -53,6 +53,10 @@ namespace Thiskord_Back.Services
             var command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("idTache", id);
             res = command.ExecuteNonQuery();
+            string queryInclude = "DELETE FROM INCLUDE WHERE id_task = @idTache;";
+            var commandInclude = new SqlCommand(queryInclude, conn);
+            commandInclude.Parameters.AddWithValue("idTache", id);
+            commandInclude.ExecuteNonQuery();
             return res;
         }
 
