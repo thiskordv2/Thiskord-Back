@@ -15,7 +15,10 @@
         public int id_creator { get; set; }
         public int id_resp { get; set; }
         public int id_project_task { get; set; }
-        public int id_parent_task { get; set; }
+        public int? id_parent_task { get; set; }
+        public int id_sprint { get; set; }
+
+        public SprintTask() { }
 
         public SprintTask(int _task_id, string _task_title, string _task_desc, bool _is_subtask, string _task_status)
         {
