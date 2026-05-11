@@ -4,6 +4,8 @@ using Thiskord_Back.Models.GestionProjet;
 
 namespace Thiskord_Back.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class SprintTaskController : Controller
     {
         private readonly TaskService _sprintTaskService;

@@ -60,6 +60,20 @@ namespace Thiskord_Back.Controllers
             }
         }
 
+        [HttpGet("sprint/project/{id:int}")]
+        public IActionResult getSprintByProjet(int id)
+        {
+            try
+            {
+                Sprint[] res = _sprintService.getSprintByProject(id);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPatch("sprint")]
         public IActionResult updateSprint([FromBody] Sprint req)
         {
