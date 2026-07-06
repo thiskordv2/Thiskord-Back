@@ -38,3 +38,11 @@ docker run -p 8080:8080 backend
 - Le script SQL d'initialisation est `Thiskord_db.sql`.
 - Le hub SignalR est mappe sur `/chatHub`.
 - Les logs applicatifs fichiers sont ecrits dans `logs.txt`.
+
+## Également un grand merci à tous les contributeurs pour ce projet de licence :
+
+<a href="https://github.com/thiskordv2/Thiskord-Back/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=thiskordv2/Thiskord-Back" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
